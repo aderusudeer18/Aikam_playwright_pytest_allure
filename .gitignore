@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+env/
+.pytest_cache/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Node / Web
+node_modules/
+dist/
+build/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Allure
+allure-results/
+
+venv/
+__pycache__/
+.pytest_cache/
+allure-results/
+.vscode/
