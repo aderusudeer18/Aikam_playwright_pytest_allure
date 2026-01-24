@@ -1,16 +1,24 @@
 from playwright.sync_api import sync_playwright,expect 
-import allure 
 import pytest 
- 
+import allure
 
-class AllApplicant:
+
+
+class ImportResume:
     def __init__(self,page):
-        self.page=page 
+        self.page=page
+    def test_import_resumes(self,timeout=3000):
+        with allure.step("Verify resumes has imported "):
+            import_resume=self.page.locator("//span[contains(text(),'Import Resumes')]").click()
+            self.page.set_input_files('input[type="file"]', r"C:\Users\Sudeer\Downloads\Aikam_Rakesh_Mekala_Resume.pdf")
+            self.page.wait_for_selector("//button[contains(text(),'Import')]").click()
+            
+            applicant_name=self.page.locator("text=Rakesh Mekala")
+            expect(applicant_name).to_be_visible(timeout=70000)
+            self.page.reload() 
 
-   
-    def all_applicant(self, applicant_name):
-        with allure.step(f"Select applicant: {applicant_name}"):
-
+    '''def test_select_applicant(self,applicant_name):
+        with allure.step("verify send mail to applicant"):
             found = False
             max_pages = 10
 
@@ -51,11 +59,7 @@ class AllApplicant:
                     break
 
                 if not next_btn.is_enabled():
-                    allure.attach(
-                        self.page.screenshot(),
-                        name="Next_Disabled_Applicant_Not_Found",
-                        attachment_type=allure.attachment_type.PNG
-                    )
+        
                     assert False, f"Applicant '{applicant_name}' not found and Next is disabled"
 
                 next_btn.scroll_into_view_if_needed()
@@ -64,25 +68,18 @@ class AllApplicant:
 
             
                 assert False, f"Applicant '{applicant_name}' not found"
-    
 
+    def test_send_mail(self,timeout=3000):
 
-
-
-
-    def schedule_interview(self):
-        with allure.step("verify clicked on schedule interview button to schedule interview"):
-            self.page.on("dialog",lambda dialog:dialog.accept())
-            self.page.locator('//button[contains(text(),"Schedule AI Interview")]').click()
-            self.page.wait_for_selector('//label[contains(text(),"Video Interview")]').click()
-            self.page.wait_for_selector('//label[contains(text(),"Coding Assessment")]').click()
-            self.page.locator("//button[contains(text(),'Next')]").click()
-            self.page.get_by_role("button", name="Next").click()
-            self.page.get_by_role("button", name="Next").click()
-            self.page.get_by_role("button", name="Schedule", exact=True).click()
-            allure.attach(
-                    "Test case passed successfully:All the check boxs has",
-                    name="Test_Success_Message",
-                    attachment_type=allure.attachment_type.TEXT)
+        with allure.step("verify send icon to send mail to applicant"):
+                self.page.on("dialog",lambda dialog:dialog.accept())
+                self.page.locator('//div[@data-state="closed"]').nth(5).click()
+                self.page.wait_for_timeout(3000)
+                self.page.locator("//button[contains(text(),'Send Email')]").click()
+                
+                allure.attach(
+                        "Test case passed successfully:All the check boxs has checked",
+                        name="Test_Success_Message",
+                        attachment_type=allure.attachment_type.TEXT)'''
 
 

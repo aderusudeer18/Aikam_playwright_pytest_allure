@@ -1,16 +1,14 @@
-from playwright.sync_api import sync_playwright,expect 
+from playwright.sync_api import sync_playwright 
 import allure 
 import pytest 
- 
 
-class AllApplicant:
+
+class ScheduleInterview:
     def __init__(self,page):
         self.page=page 
-
-   
-    def all_applicant(self, applicant_name):
-        with allure.step(f"Select applicant: {applicant_name}"):
-
+    
+    def test_select_applicant(self,applicant_name):
+        with allure.step("verify send mail to applicant"):
             found = False
             max_pages = 10
 
@@ -51,11 +49,7 @@ class AllApplicant:
                     break
 
                 if not next_btn.is_enabled():
-                    allure.attach(
-                        self.page.screenshot(),
-                        name="Next_Disabled_Applicant_Not_Found",
-                        attachment_type=allure.attachment_type.PNG
-                    )
+        
                     assert False, f"Applicant '{applicant_name}' not found and Next is disabled"
 
                 next_btn.scroll_into_view_if_needed()
@@ -64,14 +58,9 @@ class AllApplicant:
 
             
                 assert False, f"Applicant '{applicant_name}' not found"
-    
 
-
-
-
-
-    def schedule_interview(self):
-        with allure.step("verify clicked on schedule interview button to schedule interview"):
+    def test_schedule_interview(self):
+        with allure.step("verify to schedule interview to applicant"):
             self.page.on("dialog",lambda dialog:dialog.accept())
             self.page.locator('//button[contains(text(),"Schedule AI Interview")]').click()
             self.page.wait_for_selector('//label[contains(text(),"Video Interview")]').click()
@@ -81,8 +70,6 @@ class AllApplicant:
             self.page.get_by_role("button", name="Next").click()
             self.page.get_by_role("button", name="Schedule", exact=True).click()
             allure.attach(
-                    "Test case passed successfully:All the check boxs has",
+                    "Test case passed successfully:All the check boxs has selected and check clicked on schedule button",
                     name="Test_Success_Message",
                     attachment_type=allure.attachment_type.TEXT)
-
-

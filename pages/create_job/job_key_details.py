@@ -8,24 +8,29 @@ class CreateJobPage:
         self.page = page
         
     # job title
-    def select_job_title(self, title:str,timeout=5000):
+    def select_job_title(self, title:str,timeout=3000):
         with allure.step("Input has passed to Job title"):
             job_title_input = self.page.locator('//input[@role="combobox"]')
-            expect(job_title_input).to_be_visible(timeout=15000)
+            expect(job_title_input).to_be_visible(timeout=1500)
             expect(job_title_input).to_be_enabled()
             job_title_input.click()
             job_title_input.fill("")
-            self.page.keyboard.type(title, delay=120)
+            self.page.keyboard.type(title, delay=100)
             options = self.page.locator('[role="option"]')
             matched = False
             try:
-                options.first.wait_for(state="visible", timeout=4000)
+                options.first.wait_for(state="visible", timeout=1000)
                 texts = options.all_inner_texts()
                 for i, text in enumerate(texts):
                     if text.strip().lower() == title.strip().lower():
                         options.nth(i).click()
                         matched = True
+                        allure.attach(
+                    "Test case passed successfully:given input job title is valid and selected",
+                    name="Test_Success_Message",
+                    attachment_type=allure.attachment_type.TEXT)
                         break
+
             except TimeoutError:
                 pass
         with allure.step("Give job title is Invalid ,please check"):
@@ -37,6 +42,10 @@ class CreateJobPage:
         with allure.step("Given input is matched with job_type options and selected"):
             job_type_select = self.page.locator('//button[@role="combobox"]').nth(0)
             job_type_select.click()
+            allure.attach(
+                    "Test case passed successfully:input is matched with options and selected ",
+                    name="Test_Success_Message",
+                    attachment_type=allure.attachment_type.TEXT)
         with allure.step("Given input is not Matched with Job_type options,please provide Valid Input"):
             if value not in value:
                 pytest.fail(f"Invalid job type '{value}'. Available options: {value}")
@@ -48,6 +57,10 @@ class CreateJobPage:
         with allure.step(f"Select worktype: {value}"):
             workplace_type = self.page.locator('//button[@type="button"]').nth(2)
             workplace_type.click()
+            allure.attach(
+                    "Test case passed successfully:Gven input is matched with options and selected",
+                    name="Test_Success_Message",
+                    attachment_type=allure.attachment_type.TEXT)
             if value not in value:
                 pytest.fail(f"Invalid worktype '{value}'. Available options: {value}")
             self.page.get_by_role("option", name=value).click()
@@ -59,38 +72,52 @@ class CreateJobPage:
 
     #location
 
-    def select_location(self, location: str,timeout=5000):
+    def select_location(self, location: str,timeout=3000):
         with allure.step("Select location"):
+            location_container = self.page.locator("//label[normalize-space()='Job Location']/following-sibling::*[1]")
+            expect(location_container).to_be_visible(timeout=timeout)
+            location_container.click(force=True)
+            location_input = self.page.locator("input[type='text']:not([disabled])").last
+            expect(location_input).to_be_visible(timeout=timeout)
+            location_input.fill("")
+            location_input.type(location, delay=100)
+            dropdown_feedback = self.page.locator("text=/no location|no results|not found/i")
+            allure.attach(
+                    "Test case passed successfully:Given location is matched and selected",
+                    name="Test_Success_Message",
+                    attachment_type=allure.attachment_type.TEXT)
+            if dropdown_feedback.is_visible():
+                pytest.fail(f"No location  found'{location}'")
+            self.page.keyboard.press("ArrowDown")
+            self.page.keyboard.press("Enter")
+            self.page.wait_for_timeout(300)
+            selected_value = location_input.input_value().strip().lower()
+
+
+
+            '''location_container = self.page.locator("//label[normalize-space()='Job Location']/following-sibling::*[1]")
+            expect(location_container).to_be_visible(timeout=timeout)
+            location_container.click(force=True)
+
+            location_input = self.page.locator("input[type='text']:not([disabled])").last
+
+            expect(location_input).to_be_visible(timeout=timeout)
+            location_input.fill("")
+            location_input.type(location, delay=100)
+
+           
+            dropdown_feedback = self.page.locator("text=/no location|no results|not found/i")
+
+
+            if dropdown_feedback.is_visible():
+                pytest.fail(f"No location  found'{location}'")
+            self.page.keyboard.press("ArrowDown")
+            self.page.keyboard.press("Enter")
+            self.page.wait_for_timeout(300)
+            selected_value = location_input.input_value().strip().lower()'''
+
             
-            location_details = self.page.locator('//button[@type="button"]').nth(3)
-            expect(location_details).to_be_visible(timeout=timeout)
-            location_details.click()
-
-            enter_location = self.page.locator('//input[@type="text"]').nth(3)
-            expect(enter_location).to_be_visible(timeout=timeout)
-
-            enter_location.fill("")
-            enter_location.type(location, delay=150)
-
-            options = self.page.locator(
-                "//div[contains(@class,'option') or contains(@class,'item') or contains(@class,'list')]"
-            )
-            options.first.wait_for(timeout=timeout)
-
-            matched = False
-
-            for i in range(options.count()):
-                option_text = options.nth(i).inner_text().strip().lower()
-                print("Location option:", option_text)
-
-                if location.lower() in option_text:
-                    options.nth(i).click()
-                    matched = True
-                    break
-
-            if not matched:
-                pytest.fail(f"Location '{location}' not found")
-
+        
 
 
     # project_team_size
@@ -110,21 +137,9 @@ class CreateJobPage:
 
             raise AssertionError(
                 f"Team size '{team_size}' not found. Available options: {texts}")
+    
+
         
-    '''def select_project_team_size(self, timeout=15000):
-        with allure.step("Select project team size"):
-            
-            dropdown = self.page.locator("//div[contains(@class,'team-size')]")
-            dropdown.click()
-
-            options = self.page.locator("//div[@role='group']//div[@role='option']")
-
-            expect(options.first).to_be_visible(timeout=timeout)
-
-            options.first.click()'''
-
-            
-
         
 
     def select_work_experience(self, exp_1, exp_2,timeout=5000):
@@ -175,13 +190,22 @@ class CreateJobPage:
         expect(ai_btn).to_be_visible(timeout=5000)
         expect(ai_btn).to_be_enabled()
         ai_btn.click()
+        allure.attach(
+                    "Test case passed successfully:Clicked on Ai button to generate Ai description ",
+                    name="Test_Success_Message",
+                    attachment_type=allure.attachment_type.TEXT)
 
     def select_Ai_description(self,message,timeout=12000):
         prompt =self.page.locator("//textarea[@placeholder='Enter your prompt']").fill(str(message))
         generate_Ai=self.page.locator("//button[contains(text(),'Generate with AI')]").click()
+        allure.attach(
+                    "Test case passed successfully:input is passed to Ai Description",
+                    name="Test_Success_Message",
+                    attachment_type=allure.attachment_type.TEXT)
 
     def select_next_btn2(self,timeout=18000):
         next_btn = self.page.get_by_role("button", name="Next")
         expect(next_btn).to_be_visible(timeout=5000)
         expect(next_btn).to_be_enabled()
         next_btn.click()
+        

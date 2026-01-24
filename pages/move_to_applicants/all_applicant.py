@@ -1,6 +1,7 @@
 from playwright.sync_api import sync_playwright,expect 
 import allure 
 import pytest 
+import re
  
 
 class AllApplicant:
@@ -51,11 +52,6 @@ class AllApplicant:
                     break
 
                 if not next_btn.is_enabled():
-                    allure.attach(
-                        self.page.screenshot(),
-                        name="Next_Disabled_Applicant_Not_Found",
-                        attachment_type=allure.attachment_type.PNG
-                    )
                     assert False, f"Applicant '{applicant_name}' not found and Next is disabled"
 
                 next_btn.scroll_into_view_if_needed()
@@ -64,25 +60,38 @@ class AllApplicant:
 
             
                 assert False, f"Applicant '{applicant_name}' not found"
-    
 
 
-
-
-
-    def schedule_interview(self):
-        with allure.step("verify clicked on schedule interview button to schedule interview"):
-            self.page.on("dialog",lambda dialog:dialog.accept())
-            self.page.locator('//button[contains(text(),"Schedule AI Interview")]').click()
-            self.page.wait_for_selector('//label[contains(text(),"Video Interview")]').click()
-            self.page.wait_for_selector('//label[contains(text(),"Coding Assessment")]').click()
-            self.page.locator("//button[contains(text(),'Next')]").click()
-            self.page.get_by_role("button", name="Next").click()
-            self.page.get_by_role("button", name="Next").click()
-            self.page.get_by_role("button", name="Schedule", exact=True).click()
+    def move_to_applicant(self,timeout=3000):
+        with allure.step("select applicant  to move stage"):
+            move_to = self.page.locator('//button[@type="button"]').nth(1)
+            move_to .click()
+            self.page.get_by_role("option", name="Pre-Screened").click()
+            skip=self.page.wait_for_selector("//button[contains(text(),'Skip')]").click()
             allure.attach(
-                    "Test case passed successfully:All the check boxs has",
+                    "Applicant is moved to particular stage ",
                     name="Test_Success_Message",
                     attachment_type=allure.attachment_type.TEXT)
+            
+
+    def check_stage(self,stage_name,applicant_name):
+        with allure.step(f"Verify applicant '{applicant_name}' is in stage '{stage_name}'"):
+            stage_btn = self.page.get_by_role("button",name=re.compile(stage_name, re.IGNORECASE)).first
+
+            expect(stage_btn).to_be_visible()
+            stage_btn.click()
+       
+            self.page.wait_for_timeout(1500)
+
+            applicant = self.page.locator(f"//*[normalize-space()='{applicant_name}']")
+            expect(applicant.first).to_be_visible()
+            allure.attach(
+                    "Test case passed successfully:Applicant is moved to pre-screened stage",
+                    name="Test_Success_Message",
+                    attachment_type=allure.attachment_type.TEXT)
+            
+           
+
+
 
 

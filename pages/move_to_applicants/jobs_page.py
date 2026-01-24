@@ -6,7 +6,7 @@ class jobsPage:
     def __init__(self,page):
         self.page=page
 
-    def jobs_page(self, job_name):
+    def jobs_page(self, job_name,timeout=3000):
         with allure.step(f"Select job: {job_name}"):
             job_row = self.page.get_by_role("row", name=job_name).get_by_role("link")
             if job_row.count() == 0:

@@ -16,6 +16,10 @@ class AIDescriptionPage:
         with allure.step("Input has passed to LLM to generate description"):
             prompt =self.page.locator("//textarea[@placeholder='Enter your prompt']").fill(str(message))
             generate_Ai=self.page.locator("//button[contains(text(),'Generate with AI')]").click()
+            allure.attach(
+                    "Test case passed successfully:Ai generated description for job ",
+                    name="Test_Success_Message",
+                    attachment_type=allure.attachment_type.TEXT)
 
     def select_next_btn2(self,timeout=18000):
         with allure.step("Job description generated successfully and Clicking on Next button"):

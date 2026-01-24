@@ -7,7 +7,7 @@ class ViewJob:
     def __init__(self,page):
         self.page=page 
     
-    def view_job(self):
+    def view_job(self,timeout=3000):
         with allure.step("Click View Applicants"):
 
             btn = self.page.locator("//p[contains(text(),'View Applicants')]")

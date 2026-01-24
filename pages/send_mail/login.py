@@ -4,7 +4,7 @@ import pytest
 
 
 
-class LoginPage:
+class Logindetails:
     def __init__(self, page):
         self.page = page
 
@@ -12,7 +12,7 @@ class LoginPage:
         self.page.goto("https://aikam-app-qa-793571778940.asia-south1.run.app/")
 
     
-    def login(self, email, password):
+    def login(self, email, password,timeout=3000):
         with allure.step(f"Login attempt with email: {email}"):
 
             # Fill credentials
@@ -48,6 +48,9 @@ class LoginPage:
 
 
     
+
+    
+  
 
     
   

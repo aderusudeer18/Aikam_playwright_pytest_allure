@@ -7,13 +7,10 @@ class ViewJob:
     def __init__(self,page):
         self.page=page 
     
-    def view_job(self):
+    def view_job(self,timeout=3000):
         with allure.step("Click View Applicants"):
-
             btn = self.page.locator("//p[contains(text(),'View Applicants')]")
-
-            if btn.count() > 0 and btn.first.is_visible():
-               
+            if btn.count() > 0 and btn.first.is_visible(): 
                 btn.first.click()
                 allure.attach(
                     "Test case passed successfully:view applicant button is clicked",
