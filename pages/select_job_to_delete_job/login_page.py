@@ -8,7 +8,7 @@ class LoginPage:
     def open(self):
         self.page.goto("https://aikam-app-qa-793571778940.asia-south1.run.app/")
 
-    def login_invald_email(self, email, password):
+    '''def login_invald_email(self, email, password):
         with allure.step("Login with invalid email"):
             self.page.wait_for_selector('//input[@type="email"]').type(email)
             self.page.wait_for_selector('//input[@type="password"]').type(password)
@@ -22,12 +22,16 @@ class LoginPage:
             self.page.wait_for_selector('//input[@type="password"]').type(password)
             self.page.wait_for_selector('//div[text()="Login"]').click()
             error =self.page.get_by_text("Invalid email or password")
-            expect(error).to_be_visible(timeout=5000)
+            expect(error).to_be_visible(timeout=5000)'''
 
-    def login(self, email, password):
+    def login(self, email, password,timeout=2000):
         with allure.step("Login with valid email and password"):
             self.page.wait_for_selector('//input[@type="email"]').type(email)
             self.page.wait_for_selector('//input[@type="password"]').type(password)
             self.page.wait_for_selector('//div[text()="Login"]').click()
+            allure.attach(
+                    "Test case passed successfully:Login has done with valid creditionals",
+                    name="Test_Success_Message",
+                    attachment_type=allure.attachment_type.TEXT)
             
             

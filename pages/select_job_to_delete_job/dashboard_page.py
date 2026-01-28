@@ -13,9 +13,8 @@ class DashboardPage:
                     "Test case passed successfully:Jobs icon is clicked ",
                     name="Test_Success_Message",
                     attachment_type=allure.attachment_type.TEXT)
+            
 
-    def test_create_job(self,timeout=5000):
-        with allure.step("Clicked on Create job button in the jobs page"):
-            create_job = self.page.locator("//button[contains(text(),'Create Job')]")
-            #expect(create_job).to_be_visible()
-            create_job.click()
+
+
+   

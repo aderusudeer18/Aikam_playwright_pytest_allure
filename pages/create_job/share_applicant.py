@@ -64,7 +64,7 @@ class ShareApplicant:
             self.page.locator("//div[@data-state='closed']").nth(6).click()
             email_input = self.page.get_by_placeholder("Enter email and press Enter")
             email_input.wait_for(state="visible", timeout=3000)
-            email_input.fill("aderu.sudeer@gmail.com")
+            email_input.fill("aderu.sudeer@com")
             email_input.press("Enter")
             allure.attach(
                         "Test case passed successfully:applicant selected and share details",

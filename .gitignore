@@ -3,28 +3,29 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+*.log
+
+# Virtual Environment
 venv/
 env/
+.venv/
+
+# Playwright
+playwright-report/
+test-results/
+.trace/
+blob-report/
+
+# Pytest
 .pytest_cache/
 
-# VS Code
-.vscode/
-*.code-workspace
-
-# Node / Web
+# Node
 node_modules/
-dist/
-build/
 
-# OS
+# IDE
+.vscode/
+.idea/
+
+# OS files
 .DS_Store
 Thumbs.db
-
-# Allure
-allure-results/
-
-venv/
-__pycache__/
-.pytest_cache/
-allure-results/
-.vscode/

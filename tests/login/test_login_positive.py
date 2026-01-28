@@ -31,10 +31,10 @@ def test_login_valid_credtionals(page):
     job_key_details.select_job_type("Full-time")
     job_key_details.select_worktype("On-site")
     job_key_details.select_location("Hyderabad")
-    job_key_details.select_project_team_size("1-5")
-    job_key_details.select_work_experience("2","5")
+    job_key_details.select_project_team_size("21-50")
+    job_key_details.select_work_experience("3","5")
     job_key_details.salary_range("40000", "60000")
-    job_key_details.select_target_deadline("31-01-2026")
+    job_key_details.select_target_deadline("21-04-2026")
     job_key_details.select_next_btn1()
 
 
@@ -69,14 +69,14 @@ def test_login_valid_credtionals(page):
     resume=ImportResume(page)
     resume.test_import_resumes()
 
-    '''send_mail=SendMail(page)
+    send_mail=SendMail(page)
     send_mail.test_select_applicant("Rakesh Mekala")
     send_mail.test_send_mail()  
 
     schedule_interview=ScheduleInterview(page)
     schedule_interview.test_select_applicant("Rakesh Mekala") 
-    schedule_interview.test_schedule_interview() '''
-
+    schedule_interview.test_schedule_interview() 
+    
     share_applicant_details=ShareApplicant(page)
     share_applicant_details.test_select_applicant("Rakesh Mekala") 
     share_applicant_details.test_share_applicant()

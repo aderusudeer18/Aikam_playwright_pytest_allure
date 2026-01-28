@@ -11,7 +11,8 @@ class JobsPage:
     def wait_until_jobs_page(self):
         with allure.step("Wait until redirected and Jobs page is ready"):
             self.page.wait_for_url("**/jobs**", timeout=20000)
-            expect(self.jobs_list.first).to_be_visible(timeout=20000)
+            self.jobs_list.first.wait_for(state="visible", timeout=20000)
+
     def verify_job_created(self, job_title):
         with allure.step("Verify created job appears in Jobs list"):
             self.page.reload()
