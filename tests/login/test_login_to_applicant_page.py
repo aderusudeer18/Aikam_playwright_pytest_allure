@@ -1,8 +1,8 @@
-from pages.login_to_applicant_page.login import LoginPage 
-from pages.login_to_applicant_page.dashboard_page import DashboardPage
-from pages.login_to_applicant_page.jobs_page import JobsPage 
-from pages.login_to_applicant_page.view_applicant_page import ViewJob 
-from pages.login_to_applicant_page.all_applicant_page import Allapplicant 
+from pages.login_advance_filters_applicant_page.login_page import LoginPage 
+from pages.login_advance_filters_applicant_page.dash_board_page import DashboardPage
+from pages.login_advance_filters_applicant_page.jobs_list_page import JobsPage 
+from pages.login_advance_filters_applicant_page.view_applicant_page_details import ViewJob 
+from pages.login_advance_filters_applicant_page.all_applicant_advance_filters_page import Allapplicant 
 
 # login  -> select random job -> if any exists applicant delete all ->import resumes around 20 -> apply advance filters ->if multiple applicants found select particular applicant then open -> first send mail -> schedule ai prescreening->and schedule Ai interview -> ai code assessment->ai code assessment ->click on resume to download ->then schedule manual interview -> download applicant card->share applicant ->provide feedback ->check reviewr back is saved
 
