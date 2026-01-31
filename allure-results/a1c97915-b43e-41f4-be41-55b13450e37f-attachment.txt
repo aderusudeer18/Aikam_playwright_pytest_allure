@@ -1,1 +1,0 @@
-Test case passed successfully:Clicked on Export excel to download applicant details
