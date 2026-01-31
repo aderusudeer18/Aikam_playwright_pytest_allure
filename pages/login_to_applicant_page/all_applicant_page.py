@@ -255,6 +255,8 @@ class Allapplicant:
                     attachment_type=allure.attachment_type.TEXT)  
             
             
+
+            
     
             
 

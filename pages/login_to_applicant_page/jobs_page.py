@@ -25,3 +25,5 @@ class JobsPage:
                     attachment_type=allure.attachment_type.TEXT)
             else:
                 raise AssertionError(f" Job not found. Job ID: {job_id}, Job Title: {job_title}")
+
+
