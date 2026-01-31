@@ -1,0 +1,1 @@
+Test case passed successfully:job is visible and clickable
