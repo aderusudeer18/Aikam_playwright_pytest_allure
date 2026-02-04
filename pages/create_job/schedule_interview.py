@@ -62,9 +62,10 @@ class ScheduleInterview:
     def test_schedule_interview(self):
         with allure.step("verify to schedule interview to applicant"):
             self.page.on("dialog",lambda dialog:dialog.accept())
-            self.page.locator('//button[contains(text(),"Schedule AI Interview")]').click()
-            self.page.wait_for_selector('//label[contains(text(),"Video Interview")]').click()
-            self.page.wait_for_selector('//label[contains(text(),"Coding Assessment")]').click()
+            schedule_ai_interview=self.page.locator('//button[contains(text(),"Schedule AI Interview")]')
+            schedule_ai_interview.click()
+            self.page.locator('//label[contains(text(),"Video Interview")]').click()
+            self.page.locator('//label[contains(text(),"Coding Assessment")]').click()
             self.page.locator("//button[contains(text(),'Next')]").click()
             self.page.get_by_role("button", name="Next").click()
             self.page.get_by_role("button", name="Next").click()

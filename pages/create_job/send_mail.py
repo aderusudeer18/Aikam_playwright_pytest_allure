@@ -12,7 +12,7 @@ class SendMail:
             found = False
             max_pages = 10
 
-            for _ in range(max_pages):
+            for i in range(max_pages):
 
                 self.page.wait_for_load_state("networkidle")
                 self.page.wait_for_timeout(2000)
@@ -63,7 +63,7 @@ class SendMail:
 
         with allure.step("verify send icon to send mail to applicant"):
                 self.page.on("dialog",lambda dialog:dialog.accept())
-                self.page.locator('//div[@data-state="closed"]').nth(5).click()
+                self.page.locator('//div[@data-state="closed"]').nth(3).click()
                 self.page.wait_for_timeout(3000)
                 self.page.locator("//button[contains(text(),'Send Email')]").click()
                 

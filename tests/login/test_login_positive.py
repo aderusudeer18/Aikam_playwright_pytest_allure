@@ -18,7 +18,7 @@ def test_login_valid_credtionals(page):
     
     login = LoginPage(page)
     login.open()
-    login.login("liliya.moka@symphonize.com", "Liliya@123") 
+    login.login("himakar.vempati@symphonize.com", "Himakar@123") 
 
     dashboard=DashboardPage(page)
     dashboard.job_icon()
@@ -27,7 +27,7 @@ def test_login_valid_credtionals(page):
 
 
     job_key_details = CreateJobPage(page)
-    job_key_details.select_job_title("python developer")
+    job_key_details.select_job_title("Software Engineer")
     job_key_details.select_job_type("Full-time")
     job_key_details.select_worktype("On-site")
     job_key_details.select_location("Hyderabad")
@@ -60,7 +60,7 @@ def test_login_valid_credtionals(page):
 
     jobs_list=JobsPage(page)
     jobs_list.wait_until_jobs_page()
-    jobs_list.verify_job_created("Python developer") 
+    jobs_list.verify_job_created("Software Engineer") 
 
 
     view_btn=ViewJob(page)
@@ -79,7 +79,7 @@ def test_login_valid_credtionals(page):
     
     share_applicant_details=ShareApplicant(page)
     share_applicant_details.test_select_applicant("Rakesh Mekala") 
-    share_applicant_details.test_share_applicant()
+    share_applicant_details.test_share_applicant("aderu.sudeer@gmail.com")
 
 
 

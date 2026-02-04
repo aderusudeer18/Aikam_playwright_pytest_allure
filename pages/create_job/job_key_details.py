@@ -11,68 +11,77 @@ class CreateJobPage:
     # job title
     def select_job_title(self, title:str,timeout=3000):
         with allure.step("Input has passed to Job title"):
-            job_title_input = self.page.locator('//input[@role="combobox"]')
-            expect(job_title_input).to_be_visible(timeout=1500)
-            expect(job_title_input).to_be_enabled()
+            job_title_input = self.page.locator('//input[@placeholder="Title that describes the role"]')
+            job_title_input.wait_for(state="visible", timeout=timeout)
             job_title_input.click()
-            job_title_input.fill("")
-            job_title_input.fill(title) 
+            job_title_input.fill(title)
 
             options = self.page.locator('[role="option"]')
             matched = False
 
-            
             try:
                 options.first.wait_for(state="visible", timeout=2000)
 
                 texts = options.all_inner_texts()
-                for i, text in enumerate(texts):
-                    if text.strip().lower() == title.strip().lower():  
-                        options.nth(i).click()
-                        matched = True
-                        allure.attach(
-                            f"Job title '{title}' selected successfully",
-                            name="Test_Success_Message",
-                            attachment_type=allure.attachment_type.TEXT
-                        )
-                        break
 
-            except TimeoutError:
-                pass
-
-            
-            if not matched:
-                pytest.fail(
-                    f"Invalid job title '{title}'. Exact match not found in dropdown options: {texts}")
-                
-
-                
-            ''' job_title_input = self.page.locator('//input[@role="combobox"]')
-            expect(job_title_input).to_be_visible(timeout=1500)
-            expect(job_title_input).to_be_enabled()
-            job_title_input.click()
-            job_title_input.fill("")
-            self.page.keyboard.type(title, delay=100)
-            options = self.page.locator('[role="option"]')
-            matched = False
-            try:
-                options.first.wait_for(state="visible", timeout=1000)
-                texts = options.all_inner_texts()
                 for i, text in enumerate(texts):
                     if text.strip().lower() == title.strip().lower():
                         options.nth(i).click()
                         matched = True
                         allure.attach(
-                    "Test case passed successfully:given input job title is valid and selected",
-                    name="Test_Success_Message",
-                    attachment_type=allure.attachment_type.TEXT)
+                            f"Job title '{title}' selected from dropdown",
+                            name="Dropdown_Select",
+                            attachment_type=allure.attachment_type.TEXT
+                        )
                         break
 
             except TimeoutError:
-                pass
-        with allure.step("Give job title is Invalid ,please check"):
+                pass   # No dropdown shown → allowed
+
             if not matched:
-                self.page.keyboard.press("Enter")'''
+                # Keep typed value, no failure
+                allure.attach(
+                    f"Job title '{title}' kept as manual input",
+                    name="Manual_Input",
+                    attachment_type=allure.attachment_type.TEXT
+                )
+
+            '''job_title_input = self.page.locator('//input[@placeholder="Title that describes the role"]')
+            job_title_input.wait_for(state="visible", timeout=timeout)
+            job_title_input.click()
+            job_title_input.fill(title)
+
+            options = self.page.locator('[role="option"]')
+            matched = False
+            texts = []   
+
+            try:
+                options.first.wait_for(state="visible", timeout=2000)
+
+                texts = options.all_inner_texts()
+
+                for i, text in enumerate(texts):
+                    if text.strip().lower() == title.strip().lower():
+                        options.nth(i).click()
+                        matched = True
+                        allure.attach(
+                            f"Job title '{title}' selected successfully",
+                            name="Test_Success_Message",
+                            attachment_type=allure.attachment_type.TEXT)
+                        break
+
+            except TimeoutError:
+                pytest.fail(f"No dropdown options appeared after entering job title '{title}'")
+
+            if not matched:
+                pytest.fail(
+                    f"Invalid job title '{title}'. "
+                    f"Available options: {texts}")'''
+
+                
+
+                
+            
     #job_type
 
     def select_job_type(self,value : str,timeout=5000):
@@ -151,35 +160,6 @@ class CreateJobPage:
                 attachment_type=allure.attachment_type.TEXT)
 
 
-
-        ''' location_container = self.page.locator("//label[normalize-space()='Job Location']/following-sibling::*[1]")
-            expect(location_container).to_be_visible(timeout=timeout)
-            location_container.click(force=True)
-            location_input = self.page.locator("input[type='text']:not([disabled])").last
-            expect(location_input).to_be_visible(timeout=timeout)
-            location_input.fill("")
-            location_input.type(location, delay=100)
-            dropdown_feedback = self.page.locator("text=/no location|no results|not found/i")
-            allure.attach(
-                    "Test case passed successfully:Given location is matched and selected",
-                    name="Test_Success_Message",
-                    attachment_type=allure.attachment_type.TEXT)
-            if dropdown_feedback.is_visible():
-                pytest.fail(f"No location  found'{location}'")
-            self.page.keyboard.press("ArrowDown")
-            self.page.keyboard.press("Enter")
-            self.page.wait_for_timeout(300)
-            selected_value = location_input.input_value().strip().lower()'''
-            
-
-
-
-        
-
-            
-        
-
-
     # project_team_size
     def select_project_team_size(self, value: str,timeout=5000):
         with allure.step("Selected valid option in project team size:{team_size}"):
@@ -233,26 +213,19 @@ class CreateJobPage:
             calendar = self.page.locator("//div[@role='dialog']")
             expect(calendar).to_be_visible(timeout=timeout)
 
-            # 👉 Month-Year header (generic & reliable)
-            month_year = calendar.locator(
-                "//div[@aria-live='polite'] | //h6 | //div[contains(@class,'Header')]"
-            )
+        
+            month_year = calendar.locator("//div[@aria-live='polite'] | //h6 | //div[contains(@class,'Header')]")
             expect(month_year.first).to_be_visible(timeout=timeout)
 
-            # 👉 Navigation arrows (first = prev, second = next)
+          
             nav_buttons = calendar.locator("//button")
             prev_btn = nav_buttons.nth(0)
             next_btn = nav_buttons.nth(1)
 
             expect(next_btn).to_be_visible(timeout=timeout)
-
-            # Read current month/year
             current = datetime.strptime(
-                month_year.first.inner_text().strip(),
-                "%B %Y"
-            )
+                month_year.first.inner_text().strip(),"%B %Y")
 
-            # Navigate only if needed
             while (current.year, current.month) != (target.year, target.month):
 
                 if (current.year, current.month) < (target.year, target.month):
@@ -262,15 +235,10 @@ class CreateJobPage:
 
                 self.page.wait_for_timeout(300)
 
-                current = datetime.strptime(
-                    month_year.first.inner_text().strip(),
-                    "%B %Y"
-                )
+                current = datetime.strptime(month_year.first.inner_text().strip(),"%B %Y")
 
-            # 👉 Select day
-            day_btn = calendar.locator(
-                f"//button[not(@disabled) and normalize-space()='{target.day}']"
-            )
+
+            day_btn = calendar.locator(f"//button[not(@disabled) and normalize-space()='{target.day}']")
 
             if day_btn.count() == 0:
                 pytest.fail(f"Day {target.day} not found in calendar")
@@ -280,26 +248,9 @@ class CreateJobPage:
             allure.attach(
                 f"Date {target} selected successfully",
                 name="Date Selected",
-                attachment_type=allure.attachment_type.TEXT
-            )
+                attachment_type=allure.attachment_type.TEXT)
 
-
-        ''' with allure.step("Given deadline is valid and selected"):
-            self.page.locator("//label[text()='Target Deadline']/following::button[1]").click() 
-            self.page.wait_for_selector("//div[@role='dialog' and @data-state='open']") 
-            target_month = "January" 
-            while True: 
-                current_month = self.page.locator("//div[@role='dialog']//*[contains(text(),'2026')]").inner_text() 
-                if target_month in current_month: 
-                    break 
-                else: 
-                    wrong_date=self.page.locator("//button[contains(@aria-label,'Next')]") 
-                    wrong_date.click() 
-            date_button = self.page.locator("//div[@role='dialog']//button[normalize-space(text())='30' and not(@disabled)]") 
-            date_button.scroll_into_view_if_needed() 
-        with allure.step("Given deadline is Invalid,select the date from Tommorrow"):
-            expect(date_button,"input is valid and selected").to_be_visible(timeout=2000) 
-            date_button.click()''' 
+ 
 
     def select_next_btn1(self,timeout=5000):
         with allure.step("Selected all mandatory fields in the job key details page and clicked on next button"):

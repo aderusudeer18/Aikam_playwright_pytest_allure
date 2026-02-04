@@ -11,35 +11,7 @@ class Allapplicant:
     def __init__(self,page):
         self.page=page 
 
-    '''def delete_all_applicants(self,timeout=3000):
-        with allure.step("Delete all existing applicants in all applicants page"):
-            rows = self.page.locator("//tbody/tr")
-            if rows.count() == 0:
-                allure.attach(
-                    "No applicants found. Skipping delete step.",
-                    name="Info",
-                    attachment_type=allure.attachment_type.TEXT)
-                return
-
-            checkbox = rows.nth(0).locator('.//input[@type="checkbox"]')
-            checkbox.wait_for(state="visible")
-            checkbox.check()
-
-            delete_btn = self.page.locator("//button[@aria-haspopup='dialog']").nth(1)
-            delete_btn.wait_for(state="enabled")
-            delete_btn.click()
-
-            confirm_btn = self.page.get_by_role("button", name="Yes, Delete")
-            confirm_btn.wait_for(state="visible")
-            confirm_btn.click()
-
-            allure.attach(
-                "Applicant deleted successfully",
-                name="Delete Success",
-                attachment_type=allure.attachment_type.TEXT)'''
-                
         
-
 
     def import_resumes(self,timeout=18000):
         with allure.step("verify resumes has been imported"):
@@ -404,7 +376,7 @@ class Allapplicant:
                     name="Test_Success_Message",
                     attachment_type=allure.attachment_type.TEXT)
 
-    def advance_filters_exclude_keywords(self,skill_2,applicant_name,timeout=3000):
+    def advance_filters_exclude_keywords(self,skill_1,skill_2,applicant_name,timeout=3000):
             with allure.step("Applying advance filters to exclude keywords to applicants"):
                 all_applicant_page=self.page.locator('//a[contains(text(),"All Applicants")]')
                 all_applicant_page.click()
@@ -417,8 +389,8 @@ class Allapplicant:
                 boolean_on=self.page.locator('//button[@role="switch"]')
                 boolean_on.click()
 
-                '''keywords=self.page.locator('//input[contains(@class,"border-red-500")]')
-                keywords.type(skill_1)'''
+                keywords=self.page.locator('//input[contains(@class,"border-red-500")]')
+                keywords.type(skill_1)
 
                 exclude_keywords=self.page.locator('//input[@type="text"]')
                 exclude_keywords.type(skill_2) 

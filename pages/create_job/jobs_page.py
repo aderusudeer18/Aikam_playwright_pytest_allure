@@ -6,12 +6,16 @@ import allure
 class JobsPage:
     def __init__(self, page):
         self.page = page
-        self.jobs_list = page.locator("//table | //div[contains(@class,'job')]")
+       #self.jobs_list = page.locator("//table | //div[contains(@class,'job')]")
 
     def wait_until_jobs_page(self):
         with allure.step("Wait until redirected and Jobs page is ready"):
+            self.jobs_list = self.page.locator("//table | //div[contains(@class,'job')]")
             self.page.wait_for_url("**/jobs**", timeout=20000)
             self.jobs_list.first.wait_for(state="visible", timeout=20000)
+
+
+    
 
     def verify_job_created(self, job_title):
         with allure.step("Verify created job appears in Jobs list"):

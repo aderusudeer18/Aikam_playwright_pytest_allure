@@ -61,7 +61,7 @@ class ShareApplicant:
 
     def test_share_applicant(self,timeout=3000):
         with allure.step("verify share applicant button is visible to share applicant details"):
-            self.page.locator("//div[@data-state='closed']").nth(6).click()
+            self.page.locator("//div[@data-state='closed']").nth(4).click()
             email_input = self.page.get_by_placeholder("Enter email and press Enter")
             email_input.wait_for(state="visible", timeout=3000)
             email_input.fill("aderu.sudeer@com")

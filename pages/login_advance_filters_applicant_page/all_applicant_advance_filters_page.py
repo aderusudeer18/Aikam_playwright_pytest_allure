@@ -44,11 +44,15 @@ class Allapplicant:
     def import_resumes(self,timeout=18000):
         with allure.step("verify resumes has been imported"):
 
-            import_resume=self.page.locator("//span[contains(text(),'Import Resumes')]").click()
+            import_resume=self.page.locator("//span[contains(text(),'Import Resumes')]")
+            import_resume.click()
+            upload = self.page.locator("input[type='file']")
+            upload.wait_for(state="attached", timeout=60000)
             self.page.set_input_files('input[type="file"]',[r"C:\Users\Sudeer\Downloads\Aikam_Rakesh_Mekala_Resume (1).pdf",
                                                             r"C:\Users\Sudeer\Downloads\Aikam_FAKHRUDDIN_SHAIK_Resume.pdf",
                                                             r"C:\Users\Sudeer\Downloads\Aikam_SURESH_PAGAR_Resume.pdf",
                                                             r"C:\Users\Sudeer\Downloads\Aikam_RAHUL_KUMAR_Resume.pdf"])
+            
 
             self.page.wait_for_selector("//button[contains(text(),'Import')]").click()
             self.page.wait_for_timeout(20000)
@@ -115,20 +119,42 @@ class Allapplicant:
                 filtered_applicant=self.page.locator("div.flex.w-full.items-center.gap-2.mb-1").nth(0)
                 filtered_applicant.click()
 
-                ai_pre_screening=self.page.locator('//button[contains(text(),"AI Prescreening")]').click()
-                request_ai_pre_screening=self.page.locator('//button[contains(text(),"Request AI Prescreening")]').click()
-                Next=self.page.locator('//button[contains(text(),"Next")]').click()
-                schedule=self.page.get_by_role("button",name="Schedule",exact=True).click()
+                ai_pre_screening=self.page.locator('//button[contains(text(),"AI Prescreening")]')
+                ai_pre_screening.click()
+                request_ai_pre_screening=self.page.locator('//button[contains(text(),"Request AI Prescreening")]')
+                expect(request_ai_pre_screening).to_be_visible(timeout=1000)
+                request_ai_pre_screening.click()
+
+
+                Next=self.page.locator('//button[contains(text(),"Next")]')
+                Next.click()
+
+
+                schedule=self.page.get_by_role("button",name="Schedule",exact=True)
+                expect(schedule).to_be_visible(timeout=1000)
+                schedule.click()
 
                 ai_interview=self.page.locator('//button[contains(text(),"AI Interview")]').nth(1)
                 ai_interview.click()
-                request_ai_interview=self.page.locator('//button[contains(text(),"Request AI Interview")]').click()
-                Next=self.page.locator('//button[contains(text(),"Next")]').click()
-                schedule=self.page.get_by_role("button",name="Schedule",exact=True).click()
+                request_ai_interview=self.page.locator('//button[contains(text(),"Request AI Interview")]')
+                expect(request_ai_interview).to_be_visible(timeout=1000)
+                request_ai_interview.click()
 
-                ai_code_assessment=self.page.locator('//button[contains(text(),"AI Coding Assessment")]').click()
-                request_ai_ai_code_assessment=self.page.locator('//button[contains(text(),"Request AI Coding Assessment")]').click()
-                Next=self.page.locator('//button[contains(text(),"Next")]').click()
+                Next=self.page.locator('//button[contains(text(),"Next")]')
+                Next.click()
+
+                schedule=self.page.get_by_role("button",name="Schedule",exact=True)
+                expect(schedule).to_be_visible(timeout=1000)
+                schedule.click()
+
+                ai_code_assessment=self.page.locator('//button[contains(text(),"AI Coding Assessment")]')
+                ai_code_assessment.click()
+                request_ai_code_assessment=self.page.locator('//button[contains(text(),"Request AI Coding Assessment")]')
+                expect(request_ai_code_assessment)
+                request_ai_code_assessment.click()
+
+                Next=self.page.locator('//button[contains(text(),"Next")]')
+                Next.click()
 
                 '''custom_assessment=self.page.locator('//button[contains(text(),"Custom Assessment")]').click()
                 code_assessment_duration=self.page.locator('//input[@type="number"]').click()
@@ -143,14 +169,19 @@ class Allapplicant:
                 given_input=self.page.locator('//input[@placeholder="Input"]').fill(input2)
                 given_output=self.page.locator('//input[@placeholder="Output"]').fill(output2)'''
 
-                Next1=self.page.locator('//button[contains(text(),"Next")]').click()
-                schedule=self.page.get_by_role("button",name="Schedule",exact=True).click() 
+                Next1=self.page.locator('//button[contains(text(),"Next")]')
+                Next1.click()
+
+                schedule=self.page.get_by_role("button",name="Schedule",exact=True)
+                schedule.click() 
 
 
-                resume=self.page.locator('//button[contains(text(),"Resume")]').click()
+                resume=self.page.locator('//button[contains(text(),"Resume")]')
+                resume.click()
                 
                 with self.page.expect_download() as d:
-                    resume_download=self.page.locator('//button[contains(text(),"Download")]').click()
+                    resume_download=self.page.locator('//button[contains(text(),"Download")]')
+                    resume_download.click()
 
                 download = d.value  
 
@@ -168,10 +199,13 @@ class Allapplicant:
     def test_advance_filters_mails_sent_list(self,designation,company,timeout=3000):
         with allure.step("verify applicant page is visible"):
             self.page.locator('//a[contains(text(),"All Applicants")]').click()
-            advance=self.page.locator('//div[@data-state="closed"]').nth(9).click()
+            advance=self.page.locator('//div[@data-state="closed"]').nth(9)
+            advance.click()
             wrong_btn=self.page.locator('//button[@type="button"]').nth(4)
             wrong_btn.click()
-            reset_btn=self.page.locator('//button[contains(text(),"Reset Changes")]').click()
+
+            reset_btn=self.page.locator('//button[contains(text(),"Reset Changes")]')
+            reset_btn.click()
 
             designation_role=self.page.locator('//input[@placeholder="Search designation..."]')
             designation_role.fill(designation)
@@ -198,7 +232,8 @@ class Allapplicant:
             ai_code_assessment_sent.click()
 
 
-            view_btn=self.page.locator('//input[@value="Viewed"]').check()
+            view_btn=self.page.locator('//input[@value="Viewed"]')
+            view_btn.check()
 
             apply_btn=self.page.locator("//button[contains(text(),'Apply')]")
             expect(apply_btn).to_be_visible(timeout=2000)
@@ -215,6 +250,11 @@ class Allapplicant:
             
             advance=self.page.locator('//div[@data-state="closed"]').nth(9)
             advance.click()
+            wrong_btn_dsg=self.page.locator('//button[@type="button"]').nth(8)
+            wrong_btn_dsg.click()
+            wrong_btn_company=self.page.locator('//button[@type="button"]').nth(6)
+            wrong_btn_company.click()
+
             reset_btn=self.page.locator('//button[contains(text(),"Reset Changes")]')
             reset_btn.click()
             
@@ -260,7 +300,7 @@ class Allapplicant:
     
             
 
-    def test_advance_filter_applicant(self,cc_mail:str,interview_sub,manual_loc:str,value:str,target:str,time_from,time_to,mail_description:str,timeout=3000):
+    def test_advance_filter_applicant(self,cc_mail:str,interview_sub,interview_type:str,zoom_value:str,location:str,mobile_number,target,time_from,time_to,mail_description,timeout=3000):
         with allure.step("verify applicants has been filtered based on advance filters"):
             filtered_applicant=self.page.locator("div.flex.w-full.items-center.gap-2.mb-1").nth(0)
             filtered_applicant.click()
@@ -277,32 +317,44 @@ class Allapplicant:
             subject=self.page.locator('//input[@placeholder="Enter Interview Round or Title"]')
             subject.fill(interview_sub)
 
-            interview_type=self.page.locator('//button[@type="button"]').nth(10)
-            interview_type.click()
+            self.page.locator('//button[@role="combobox"]').nth(1).click()
+            option=self.page.get_by_role("option", name=interview_type, exact=True)
+            option.click()
 
-            '''dropdown = self.page.locator("//button[contains(@class,'select')]")
-            dropdown.click()
-            self.page.get_by_text(value, exact=True).click()'''
+            if interview_type == "Online Interview":
+                zoom_option=self.page.get_by_role("option",name=zoom_value, exact=True)
+                zoom_option.click()
+
+            elif interview_type == "Face to Face":
+                location_input = self.page.locator('//input[@placeholder="Enter Google Map Location"]')
+                location_input.fill(location)
+
+            elif interview_type=="Phone Call":
+                type_number=self.page.locator('//input[@value="+91"]')
+                type_number.fill(mobile_number)
+            
+
+
 
             allure.attach(
-                f"Job type '{value}' selected successfully",
-                name="Success",
-                attachment_type=allure.attachment_type.TEXT)
+                    f"interview type is  'Value' selected successfully",
+                    name="Success",
+                    attachment_type=allure.attachment_type.TEXT)
 
             
 
             #date selection
             target = datetime.strptime(target, "%d-%m-%Y")
             self.page.locator("//label[text()='Interview Date']/following::button[1]").click()
-            calendar = self.page.locator("//div[@role='dialog']")
-            expect(calendar).to_be_visible(timeout=timeout)
-            month_year = calendar.locator("//div[@aria-live='polite'] | //h6 | //div[contains(@class,'Header')]")
-            expect(month_year.first).to_be_visible(timeout=timeout)
-            nav_buttons = calendar.locator("//button")
-            prev_btn = nav_buttons.nth(0)
-            next_btn = nav_buttons.nth(1)
-            expect(next_btn).to_be_visible(timeout=timeout)
-            current = datetime.strptime(month_year.first.inner_text().strip(),"%B %Y")
+            month_year = self.page.locator("//div[@aria-live='polite'] | //h6")
+            month_year.first.wait_for(state="visible", timeout=timeout)
+
+            prev_btn = self.page.locator("//button").nth(0)
+            next_btn = self.page.locator("//button").nth(1)
+
+            current = datetime.strptime(
+                month_year.first.inner_text().strip(),"%B %Y")
+
             while (current.year, current.month) != (target.year, target.month):
 
                 if (current.year, current.month) < (target.year, target.month):
@@ -310,23 +362,16 @@ class Allapplicant:
                 else:
                     prev_btn.click()
 
-                self.page.wait_for_timeout(300)
+                self.page.wait_for_timeout(200)
 
-                current = datetime.strptime(month_year.first.inner_text().strip(),"%B %Y")
+                current = datetime.strptime(
+                    month_year.first.inner_text().strip(),"%B %Y")
 
-    
-            day_btn = calendar.locator(f"//button[not(@disabled) and normalize-space()='{target.day}']")
+            day_btn = self.page.locator(f"//button[.//text()[normalize-space()='{target.day}']]")
 
-            if day_btn.count() == 0:
-                pytest.fail(f"Day {target.day} not found in calendar")
-
+            day_btn.first.wait_for(state="visible", timeout=5000)
             day_btn.first.click()
 
-            
-            
-            location=self.page.locator('//input[@name="location"]')
-            location.fill(manual_loc)
-            
 
             from_time=self.page.locator('//input[@type="time"]').nth(0)
             from_time.fill(time_from)
@@ -341,17 +386,14 @@ class Allapplicant:
             send_btn.click()  
 
 
-            download_applicant=self.page.locator("div.cursor-pointer").nth(2)
-            download_applicant.click()
-            with self.page.expect_download() as d:
-                resume_download=self.page.locator('//button[contains(text(),"Download")]').click()
+            download_icon = self.page.locator("div.cursor-pointer").nth(2)
 
-            download = d.value  
+            with self.page.expect_download() as download_info:
+                download_icon.click()
 
+            download = download_info.value
 
-            path = download.path() 
-
-            save_path = fr"C:\Users\Sudeer\Downloads\{download.suggested_filename}"
+            save_path = rf"C:\Users\Sudeer\Downloads\{download.suggested_filename}"
             download.save_as(save_path)
             allure.attach(
                         "Test case passed successfully:Clicked on download applicant to download applicant details",
@@ -388,10 +430,19 @@ class Allapplicant:
             
 
 
-    def un_viewed_applicants(self,timeout=3000):
+    def un_viewed_applicants(self,select_option,timeout=3000):
         with allure.step("verify unviewed applicants are visible"):
+            all_applicant_page=self.page.locator('//a[contains(text(),"All Applicants")]')
+            all_applicant_page.click()
+
             advance=self.page.locator('//div[@data-state="closed"]').nth(9)
             advance.click()
+
+            gender=self.page.locator('//button[@role="combobox"]')
+            gender.click()
+            select_gender=self.page.get_by_role("option",name=select_option,exact=True)
+            select_gender.click()
+
             reset_btn=self.page.locator('//button[contains(text(),"Reset Changes")]')
             reset_btn.click()
             unviewed_btn=self.page.locator('//label[contains(text(),"Unviewed")]')
@@ -403,11 +454,13 @@ class Allapplicant:
                     "Test case passed successfully:Unviewed applicants are visible ",
                     name="Test_Success_Message",
                     attachment_type=allure.attachment_type.TEXT)
+            
+            
 
-    def advance_filters_exclude_keywords(self,skill_2,applicant_name,timeout=3000):
+    def advance_filters_exclude_keywords(self,skill_1,skill_2,applicant_name,timeout=3000):
             with allure.step("Applying advance filters to exclude keywords to applicants"):
-                all_applicant_page=self.page.locator('//a[contains(text(),"All Applicants")]')
-                all_applicant_page.click()
+                '''all_applicant_page=self.page.locator('//a[contains(text(),"All Applicants")]')
+                all_applicant_page.click()'''
                 advance=self.page.locator('//div[@data-state="closed"]').nth(9)
                 advance.click()
                 reset_btn=self.page.locator('//button[contains(text(),"Reset Changes")]')
@@ -417,8 +470,9 @@ class Allapplicant:
                 boolean_on=self.page.locator('//button[@role="switch"]')
                 boolean_on.click()
 
-                '''keywords=self.page.locator('//input[contains(@class,"border-red-500")]')
-                keywords.type(skill_1)'''
+                keywords = self.page.locator("//input[contains(@placeholder,'Ex:')]")
+                keywords.wait_for(state="visible")
+                keywords.fill(skill_1)
 
                 exclude_keywords=self.page.locator('//input[@type="text"]')
                 exclude_keywords.type(skill_2) 
@@ -447,48 +501,12 @@ class Allapplicant:
                     name="Test_Success_Message",
                     attachment_type=allure.attachment_type.TEXT) 
 
-            
 
-    
-
-
-                
-                
-
-            '''if filtered_applicant.count() > 0:
-                    self.page.get_by_text(applicant_name,exact=True).click()
-                    allure.attach(
-                        "Test case passed successfully:Applicants has been filtered based on advance filters",
-                        name="Test_Success_Message",
-                        attachment_type=allure.attachment_type.TEXT) 
-                else:
-                    pytest.fail("No applicants found after applying advance filters.")'''
 
 
             '''exp_skill=self.page.locator('//input[@placeholder="Enter skill"]').type(skill_1)
             min_exp=self.page.locator('//input[@placeholder="min"]').type(min_1)
             max_exp=self.page.locator('//input[@placeholder="max"]').type(max_1)'''
-
-
-            
-
-
-            
-            
-
-            '''gender=self.page.locator('//button[@type="button"]').nth(4) 
-            gender.click()
-            option=self.page.get_by_role("option",name=gender ,exact=True).click()
-            if option.count() == 0:
-                pytest.fail(f"Invalid gender '{gender}'. Please provide valid input.")
-
-            option.click()'''
-
-            '''gender_dropdown = self.page.locator('//button[@type="button"]').nth(4)
-            gender_dropdown.click()
-
-            self.page.get_by_role("option", name=gender).click()'''
-
 
             
 
