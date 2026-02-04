@@ -15,7 +15,12 @@ def test_login_to_applicant_page(page):
     #dashboard.job_icon()
 
     jobs_page=JobsPage(page)
-    jobs_page.wait_until_jobs_page("Tek0078","Python Developer")
+    '''jobs_page.verify_job_title("Job Title","SOC Analyst","Tek0075")
+    jobs_page.verify_job_Client("Client","tekworks","Tek0066")
+    jobs_page.verify_job_location("Location","Hyderabad","Tek0065")
+    jobs_page.verify_job_posted_on("Posted on","09 jan 2026")
+    jobs_page.verify_job_Target_deadline("Target Deadline","31 Mar 2026")'''
+    jobs_page.verify_job_id("Tek0078","Python Developer")
 
 
     view_btn=ViewJob(page)
@@ -32,10 +37,9 @@ def test_login_to_applicant_page(page):
     all_applicant.test_advance_filters_given_mails_list("B.Tech","Srinivasa Engineering College","Computer Science & Information Technology")
     
 
-    all_applicant.test_advance_filter_applicant("bhargav.tumati@gmail.com","Technical round","Bengaluru","Face to Face","25-02-2026","10:00 AM","12:00 PM","It is purelyy for full stack developers employees with min 5 years of experience")
-
-    all_applicant.un_viewed_applicants()
-    all_applicant.advance_filters_exclude_keywords("Email Marketing","RAHUL KUMAR")
+    all_applicant.test_advance_filter_applicant("bhargav.tumati@gmail.com","Technical round","Face to Face","Zoom","9765545567","Chennai","20-02-2026","10:00","12:00","It is purelyy for full stack developers employees with min 5 years of experience")
+    all_applicant.un_viewed_applicants("Male")
+    all_applicant.advance_filters_exclude_keywords('("Meta Ads" or "Google Analytics")',"Email Marketing","RAHUL KUMAR")
 
 
     
