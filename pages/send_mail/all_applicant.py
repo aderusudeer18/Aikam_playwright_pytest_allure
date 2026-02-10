@@ -66,14 +66,23 @@ class AllApplicant:
 
     def test_send_mail(self,timeout=5000):
         with allure.step("verify send icon to send mail to applicant"):
-            self.page.on("dialog",lambda dialog:dialog.accept())
-            self.page.locator('//div[@data-state="closed"]').nth(5).click()
-            self.page.wait_for_timeout(3000)
-            self.page.locator("//button[contains(text(),'Send Email')]")
-            
-            allure.attach(
-                    "Test case passed successfully:All the check boxs has checked",
-                    name="Test_Success_Message",
-                    attachment_type=allure.attachment_type.TEXT)
+            try:
+                self.page.on("dialog",lambda dialog:dialog.accept())
+                self.page.locator('//div[@data-state="closed"]').nth(5).click()
+                
+                # Wait for and click the Send Email button
+                email_btn = self.page.locator("//button[contains(text(),'Send Email')]")
+                email_btn.wait_for(state="visible", timeout=5000)
+                email_btn.click()
+                
+                # Wait for email to be sent (for confirmation dialog/toast)
+                self.page.wait_for_timeout(2000)
+                
+                allure.attach(
+                        "Test case passed successfully: Email sent to applicant",
+                        name="Test_Success_Message",
+                        attachment_type=allure.attachment_type.TEXT)
+            except Exception as e:
+                pytest.fail(f"Failed to send email: {e}")
 
 

@@ -6,8 +6,8 @@ from playwright.sync_api import sync_playwright
 @pytest.fixture(scope="session")
 def browser_context():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False, slow_mo=1500)
-        context = browser.new_context()
+        browser = p.chromium.launch(headless=False,  args=["--start-maximized"],slow_mo=1500)
+        context = browser.new_context(no_viewport=True)
         yield context
         context.close()
         browser.close()
@@ -17,8 +17,7 @@ def page(request, browser_context):
     page = browser_context.new_page()
     yield page
 
-    # Attach screenshot ONLY if test failed
-    if request.node.rep_call.failed:
+    if getattr(request.node, "rep_call", None) and request.node.rep_call.failed:
         os.makedirs("screenshots", exist_ok=True)
         screenshot_path = f"screenshots/{request.node.name}.png"
 

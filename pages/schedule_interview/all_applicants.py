@@ -72,17 +72,45 @@ class AllApplicant:
 
     def schedule_interview(self):
         with allure.step("verify clicked on schedule interview button to schedule interview"):
-            self.page.on("dialog",lambda dialog:dialog.accept())
-            self.page.locator('//button[contains(text(),"Schedule AI Interview")]').click()
-            self.page.wait_for_selector('//label[contains(text(),"Video Interview")]').click()
-            self.page.wait_for_selector('//label[contains(text(),"Coding Assessment")]').click()
-            self.page.locator("//button[contains(text(),'Next')]").click()
-            self.page.get_by_role("button", name="Next").click()
-            self.page.get_by_role("button", name="Next").click()
-            self.page.get_by_role("button", name="Schedule", exact=True).click()
-            allure.attach(
-                    "Test case passed successfully:All the check boxs has",
-                    name="Test_Success_Message",
-                    attachment_type=allure.attachment_type.TEXT)
+            try:
+                self.page.on("dialog",lambda dialog:dialog.accept())
+                
+                # Click Schedule AI Interview button
+                schedule_btn = self.page.locator('//button[contains(text(),"Schedule AI Interview")]')
+                schedule_btn.wait_for(state="visible", timeout=5000)
+                schedule_btn.click()
+                
+                # Wait for the modal/form to load
+                self.page.wait_for_load_state("networkidle")
+                self.page.wait_for_timeout(1000)
+                
+                # Select Video Interview
+                video_interview = self.page.locator('//label[contains(text(),"Video Interview")]')
+                video_interview.wait_for(state="visible", timeout=5000)
+                video_interview.click()
+                
+                # Select Coding Assessment
+                coding_assessment = self.page.locator('//label[contains(text(),"Coding Assessment")]')
+                coding_assessment.wait_for(state="visible", timeout=5000)
+                coding_assessment.click()
+                
+                # Click Next buttons (3 times)
+                for i in range(3):
+                    next_btn = self.page.get_by_role("button", name="Next")
+                    next_btn.wait_for(state="visible", timeout=5000)
+                    next_btn.click()
+                    self.page.wait_for_timeout(500)
+                
+                # Click Schedule button
+                schedule_final_btn = self.page.get_by_role("button", name="Schedule", exact=True)
+                schedule_final_btn.wait_for(state="visible", timeout=5000)
+                schedule_final_btn.click()
+                
+                allure.attach(
+                        "Test case passed successfully: Interview scheduled",
+                        name="Test_Success_Message",
+                        attachment_type=allure.attachment_type.TEXT)
+            except Exception as e:
+                pytest.fail(f"Failed to schedule interview: {e}")
 
 
