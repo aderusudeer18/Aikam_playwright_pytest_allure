@@ -18,7 +18,7 @@ def test_login_valid_credtionals(page):
     
     login = LoginPage(page)
     login.open()
-    login.login("himakar.vempati@symphonize.com", "Himakar@123") 
+    login.login("liliya.moka@symphonize.com", "Aikam@123") 
 
     dashboard=DashboardPage(page)
     dashboard.job_icon()
@@ -27,14 +27,16 @@ def test_login_valid_credtionals(page):
 
 
     job_key_details = CreateJobPage(page)
-    job_key_details.select_job_title("Software Engineer")
+    job_key_details.select_job_title("python developer")
+    
     job_key_details.select_job_type("Full-time")
     job_key_details.select_worktype("On-site")
+    
     job_key_details.select_location("Hyderabad")
     job_key_details.select_project_team_size("21-50")
-    job_key_details.select_work_experience("3","5")
-    job_key_details.salary_range("40000", "60000")
-    job_key_details.select_target_deadline("21-04-2026")
+    job_key_details.select_work_experience("4","5")
+    job_key_details.salary_range("20000", "30000")
+    job_key_details.select_target_deadline("21-09-2026")
     job_key_details.select_next_btn1()
 
 
@@ -60,26 +62,26 @@ def test_login_valid_credtionals(page):
 
     jobs_list=JobsPage(page)
     jobs_list.wait_until_jobs_page()
-    jobs_list.verify_job_created("Software Engineer") 
+    jobs_list.verify_job_created("Python developer") 
 
 
     view_btn=ViewJob(page)
     view_btn.view_job()
 
     resume=ImportResume(page)
-    resume.test_import_resumes()
+    resume.test_import_resumes("LILIYA MOKA")
 
     send_mail=SendMail(page)
-    send_mail.test_select_applicant("Rakesh Mekala")
+    send_mail.test_select_applicant("LILIYA MOKA")
     send_mail.test_send_mail()  
 
     schedule_interview=ScheduleInterview(page)
-    schedule_interview.test_select_applicant("Rakesh Mekala") 
+    schedule_interview.test_select_applicant("LILIYA MOKA") 
     schedule_interview.test_schedule_interview() 
     
     share_applicant_details=ShareApplicant(page)
-    share_applicant_details.test_select_applicant("Rakesh Mekala") 
-    share_applicant_details.test_share_applicant("aderu.sudeer@gmail.com")
+    share_applicant_details.test_select_applicant("LILIYA MOKA") 
+    share_applicant_details.test_share_applicant("persimmonqa@gmail.com")
 
 
 

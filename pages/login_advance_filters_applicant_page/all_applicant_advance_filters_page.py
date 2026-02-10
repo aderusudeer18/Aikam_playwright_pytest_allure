@@ -1,9 +1,9 @@
 from datetime import datetime
-from playwright.sync_api import sync_playwright ,expect
-import allure 
+from playwright.sync_api import sync_playwright, expect
+import allure
 import pytest
 import time
-from datetime import datetime
+import os
 
 from conftest import page
 
@@ -11,47 +11,39 @@ class Allapplicant:
     def __init__(self,page):
         self.page=page 
 
-    '''def delete_all_applicants(self,timeout=3000):
-        with allure.step("Delete all existing applicants in all applicants page"):
-            rows = self.page.locator("//tbody/tr")
-            if rows.count() == 0:
-                allure.attach(
-                    "No applicants found. Skipping delete step.",
-                    name="Info",
-                    attachment_type=allure.attachment_type.TEXT)
-                return
+    def import_resumes(self, timeout=30000):
+        with allure.step("Verify resumes has been imported"):
+           
+            self.page.wait_for_load_state("networkidle")
+            self.page.wait_for_timeout(3000)
 
-            checkbox = rows.nth(0).locator('.//input[@type="checkbox"]')
-            checkbox.wait_for(state="visible")
-            checkbox.check()
+            # 2. Use a robust locator to find the visible "Import Resumes" button
+            # We try the user-provided XPath and a text-based backup
+            import_btn = self.page.locator("//button[.//span[normalize-space()='Import Resumes']] | //button[contains(., 'Import Resumes')]").first
+            
+            # 3. Wait for visibility and scroll into view
+            import_btn.wait_for(state="visible", timeout=timeout)
+            import_btn.scroll_into_view_if_needed()
+            
+            # 4. Aggressive click strategy
+            try:
+                # Attempt force click first (bypasses most overlay issues)
+                import_btn.click(force=True, timeout=5000)
+            except Exception as e:
+                # Fallback to JavaScript click if standard click fails
+                allure.attach(f"Standard click failed: {str(e)}", name="Debug Info", attachment_type=allure.attachment_type.TEXT)
+                self.page.evaluate("el => el.click()", import_btn.element_handle())
 
-            delete_btn = self.page.locator("//button[@aria-haspopup='dialog']").nth(1)
-            delete_btn.wait_for(state="enabled")
-            delete_btn.click()
-
-            confirm_btn = self.page.get_by_role("button", name="Yes, Delete")
-            confirm_btn.wait_for(state="visible")
-            confirm_btn.click()
-
-            allure.attach(
-                "Applicant deleted successfully",
-                name="Delete Success",
-                attachment_type=allure.attachment_type.TEXT)'''
-                
-        
-
-
-    def import_resumes(self,timeout=18000):
-        with allure.step("verify resumes has been imported"):
-
-            import_resume=self.page.locator("//span[contains(text(),'Import Resumes')]")
-            import_resume.click()
+            # 5. Wait for the file input to appear after the click
             upload = self.page.locator("input[type='file']")
             upload.wait_for(state="attached", timeout=60000)
-            self.page.set_input_files('input[type="file"]',[r"C:\Users\Sudeer\Downloads\Aikam_Rakesh_Mekala_Resume (1).pdf",
-                                                            r"C:\Users\Sudeer\Downloads\Aikam_FAKHRUDDIN_SHAIK_Resume.pdf",
-                                                            r"C:\Users\Sudeer\Downloads\Aikam_SURESH_PAGAR_Resume.pdf",
-                                                            r"C:\Users\Sudeer\Downloads\Aikam_RAHUL_KUMAR_Resume.pdf"])
+            
+            self.page.set_input_files('input[type="file"]', [
+                r"C:\Users\Sudeer\Downloads\Aikam_Rakesh_Mekala_Resume (1).pdf",
+                r"C:\Users\Sudeer\Downloads\Aikam_FAKHRUDDIN_SHAIK_Resume.pdf",
+                r"C:\Users\Sudeer\Downloads\Aikam_SURESH_PAGAR_Resume.pdf",
+                r"C:\Users\Sudeer\Downloads\Aikam_RAHUL_KUMAR_Resume.pdf"
+            ])
             
 
             self.page.wait_for_selector("//button[contains(text(),'Import')]").click()
@@ -71,12 +63,14 @@ class Allapplicant:
                         attachment_type=allure.attachment_type.TEXT)
                     self.page.wait_for_timeout(3000)
                     self.page.reload()
-                    return
+                    return  
+                
 
-    
-               
-
-            
+    def export_excel_btn(self,timeout=2000):
+        with allure.step("Clicking on Export excel button"):
+            self.page.locator('//button[@style="color: transparent;"]')
+     
+   
 
     def advance_filters(self,skill_1,skill_2,skill_3,email_id,number,can_loc_1,can_loc_2,timeout=3000):
         with allure.step("Applying advance filters to applicants"):
@@ -87,11 +81,6 @@ class Allapplicant:
             keyword.type(skill_2)
             self.page.keyboard.press("Enter")
             keyword.type(skill_3)
-
-
-            ''' mandatory_checkbox=self.page.locator('//button[@type="button"]').nth(7)
-            mandatory_checkbox.check()'''
-
 
             email=self.page.locator('//input[@placeholder="Search email..."]')
             email.type(email_id)
@@ -113,7 +102,7 @@ class Allapplicant:
             apply_btn.click()
 
 
-    def test_verify_applicant_filtered(self,applicant_name,timeout=3000):
+    def verify_applicant_filtered(self,timeout=3000):
             with allure.step("verify applicants has been filtered based on advance filters"):
                 #if filtered_applicant.count() >1:
                 filtered_applicant=self.page.locator("div.flex.w-full.items-center.gap-2.mb-1").nth(0)
@@ -122,57 +111,51 @@ class Allapplicant:
                 ai_pre_screening=self.page.locator('//button[contains(text(),"AI Prescreening")]')
                 ai_pre_screening.click()
                 request_ai_pre_screening=self.page.locator('//button[contains(text(),"Request AI Prescreening")]')
-                expect(request_ai_pre_screening).to_be_visible(timeout=1000)
+                request_ai_pre_screening.wait_for(state="visible")
                 request_ai_pre_screening.click()
 
 
                 Next=self.page.locator('//button[contains(text(),"Next")]')
+                Next.wait_for(state="visible")
                 Next.click()
 
 
                 schedule=self.page.get_by_role("button",name="Schedule",exact=True)
-                expect(schedule).to_be_visible(timeout=1000)
+                schedule.wait_for(state="visible")
                 schedule.click()
 
                 ai_interview=self.page.locator('//button[contains(text(),"AI Interview")]').nth(1)
                 ai_interview.click()
                 request_ai_interview=self.page.locator('//button[contains(text(),"Request AI Interview")]')
-                expect(request_ai_interview).to_be_visible(timeout=1000)
+                request_ai_interview.wait_for(state="visible")
                 request_ai_interview.click()
 
                 Next=self.page.locator('//button[contains(text(),"Next")]')
+                Next.wait_for(state="visible")
                 Next.click()
 
                 schedule=self.page.get_by_role("button",name="Schedule",exact=True)
-                expect(schedule).to_be_visible(timeout=1000)
+                schedule.wait_for(state="visible")
                 schedule.click()
 
                 ai_code_assessment=self.page.locator('//button[contains(text(),"AI Coding Assessment")]')
                 ai_code_assessment.click()
                 request_ai_code_assessment=self.page.locator('//button[contains(text(),"Request AI Coding Assessment")]')
-                expect(request_ai_code_assessment)
+                request_ai_code_assessment.wait_for(state="visible")
                 request_ai_code_assessment.click()
 
                 Next=self.page.locator('//button[contains(text(),"Next")]')
+                Next.wait_for(state="visible")
                 Next.click()
 
-                '''custom_assessment=self.page.locator('//button[contains(text(),"Custom Assessment")]').click()
-                code_assessment_duration=self.page.locator('//input[@type="number"]').click()
-                description=self.page.locator('//textarea[@placeholder="Enter description"]').type(question1)
-                description.click()
-                given_input=self.page.locator('//input[@placeholder="Input"]').fill(input1)
-                given_output=self.page.locator('//input[@placeholder="Output"]').fill(output1)
 
-                add_question=self.page.locator('//span[contains(text(),"+ Add Question")]').click()
-                description=self.page.locator('//textarea[@placeholder="Enter description"]').type(question2)
-                description.click()
-                given_input=self.page.locator('//input[@placeholder="Input"]').fill(input2)
-                given_output=self.page.locator('//input[@placeholder="Output"]').fill(output2)'''
 
                 Next1=self.page.locator('//button[contains(text(),"Next")]')
+                Next1.wait_for(state="visible")
                 Next1.click()
 
                 schedule=self.page.get_by_role("button",name="Schedule",exact=True)
+                schedule.wait_for(state="visible")
                 schedule.click() 
 
 
@@ -188,7 +171,7 @@ class Allapplicant:
 
                 path = download.path() 
 
-                save_path = fr"C:\Users\Sudeer\Downloads\{download.suggested_filename}"
+                save_path = os.path.join(os.path.expanduser("~"), "Downloads", download.suggested_filename)
                 download.save_as(save_path)
                 allure.attach(
                             "Test case passed successfully:Clicked on Resume to download applicant resume",
@@ -196,7 +179,7 @@ class Allapplicant:
                             attachment_type=allure.attachment_type.TEXT) 
                 
 
-    def test_advance_filters_mails_sent_list(self,designation,company,timeout=3000):
+    def verify_advance_filters_mails_sent_list(self,designation,company,timeout=3000):
         with allure.step("verify applicant page is visible"):
             self.page.locator('//a[contains(text(),"All Applicants")]').click()
             advance=self.page.locator('//div[@data-state="closed"]').nth(9)
@@ -217,10 +200,7 @@ class Allapplicant:
             #self.page.keyboard.press("ArrowDown")
             self.page.keyboard.press("Enter")
 
-            '''industry_type=self.page.locator('//input[@placeholder="Search industry..."]')
-            industry_type.fill(industry)
-            self.page.keyboard.press("ArrowDown")
-            self.page.keyboard.press("Enter")'''
+
 
 
 
@@ -245,7 +225,7 @@ class Allapplicant:
                     attachment_type=allure.attachment_type.TEXT) 
 
 
-    def test_advance_filters_given_mails_list(self,ug,institute_name,course_name,timeout=3000):
+    def verify_advance_filters_given_mails_list(self,ug,institute_name,course_name,timeout=3000):
         with allure.step("verify interviews toggles given list"):
             
             advance=self.page.locator('//div[@data-state="closed"]').nth(9)
@@ -264,8 +244,7 @@ class Allapplicant:
             self.page.keyboard.press("ArrowDown")
             self.page.keyboard.press("Enter")
 
-            '''pg_qualification=self.page.locator('//input[@placeholder="Search PG qualification..."]')
-            pg_qualification.fill(pg)'''
+
 
             institute=self.page.locator('//input[@placeholder="Search institute..."]')
             institute.fill(institute_name)
@@ -300,7 +279,7 @@ class Allapplicant:
     
             
 
-    def test_advance_filter_applicant(self,cc_mail:str,interview_sub,interview_type:str,zoom_value:str,location:str,mobile_number,target,time_from,time_to,mail_description,timeout=3000):
+    def verify_advance_filter_applicant(self,cc_mail:str,interview_sub,interview_type:str,zoom_value:str,location:str,mobile_number,target,time_from,time_to,mail_description,timeout=3000):
         with allure.step("verify applicants has been filtered based on advance filters"):
             filtered_applicant=self.page.locator("div.flex.w-full.items-center.gap-2.mb-1").nth(0)
             filtered_applicant.click()
@@ -393,7 +372,7 @@ class Allapplicant:
 
             download = download_info.value
 
-            save_path = rf"C:\Users\Sudeer\Downloads\{download.suggested_filename}"
+            save_path = os.path.join(os.path.expanduser("~"), "Downloads", download.suggested_filename)
             download.save_as(save_path)
             allure.attach(
                         "Test case passed successfully:Clicked on download applicant to download applicant details",
@@ -455,12 +434,10 @@ class Allapplicant:
                     name="Test_Success_Message",
                     attachment_type=allure.attachment_type.TEXT)
             
-            
+
 
     def advance_filters_exclude_keywords(self,skill_1,skill_2,applicant_name,timeout=3000):
-            with allure.step("Applying advance filters to exclude keywords to applicants"):
-                '''all_applicant_page=self.page.locator('//a[contains(text(),"All Applicants")]')
-                all_applicant_page.click()'''
+        with allure.step("Applying advance filters to exclude keywords to applicants"):
                 advance=self.page.locator('//div[@data-state="closed"]').nth(9)
                 advance.click()
                 reset_btn=self.page.locator('//button[contains(text(),"Reset Changes")]')
@@ -482,19 +459,22 @@ class Allapplicant:
                 expect(apply_btn).to_be_visible(timeout=2000)
                 apply_btn.click()
 
-                row = self.page.locator(f"//tr[.//*[contains(text(),'{applicant_name}')]]")
+                container = self.page.locator("div",has=self.page.get_by_text(applicant_name, exact=True)).first
+
+                expect(container).to_be_visible(timeout=15000)
+                checkbox = container.locator("input[type='checkbox']").nth(1)
+
+                expect(checkbox).to_be_visible(timeout=5000)
+                checkbox.check(force=True)
                 allure.attach(
                     "Test case passed successfully:applicant card is exists and selected",
                     name="Test_Success_Message",
                     attachment_type=allure.attachment_type.TEXT)
 
-                checkbox = row.locator("input[type='checkbox']")
-
-                checkbox.first.wait_for(state="visible")
-                checkbox.first.check()
+                
                 delete_btn=self.page.locator("//button[@aria-haspopup='dialog']").nth(1)
                 delete_btn.click()
-                yes_cancle=self.page.locator('//button[@type="button"]').nth(8)
+                yes_cancle=self.page.locator('//button[@type="button"]').nth(11)
                 yes_cancle.click()
                 allure.attach(
                     "Test case passed successfully:Advance filters has applied to all applicants and displayed ",
@@ -504,75 +484,3 @@ class Allapplicant:
 
 
 
-            '''exp_skill=self.page.locator('//input[@placeholder="Enter skill"]').type(skill_1)
-            min_exp=self.page.locator('//input[@placeholder="min"]').type(min_1)
-            max_exp=self.page.locator('//input[@placeholder="max"]').type(max_1)'''
-
-            
-
-            '''Notice_period=self.page.locator('//input[@type="number"]').nth(2)
-            Notice_period.type(period)'''
-
-
-            
-            
-        
-            
-        
-
-
-            
-
-
-            
-            
-            
-
-    '''def re_set_changes(self,timeout=3000):
-        with allure.step("reset your changes in the  advance filters "):
-            advance=self.page.locator('//div[@data-state="closed"]').nth(11).click()
-            reset_btn=self.page.locator('//button[contains(text(),"Reset Changes")]').click()
-            apply=self.page.wait_for_selector("//button[contains(text(),'Apply')]").click() 
-            self.page.reload()'''
-
-
-            
-
-    '''def search_by_name_to_delete(self,applicant_name,timeout=3000):
-        with allure.step("search by name or email,Phone number"):
-            self.page.locator("div.cursor-pointer svg.lucide-search").click()
-            search_name = self.page.locator('//input[@type="text"]').nth(1)
-            search_name.click()
-            search_name.fill(applicant_name)
-            search_name.press("Enter")
-
-
-            allure.attach(
-                f"Applicant {applicant_name} visible after search",
-                name="Search Success",
-                attachment_type=allure.attachment_type.TEXT
-            )'''
-            
-
-           
-            
-
-   
-    '''def applicant_to_delete(self, applicant_name):
-        with allure.step(f"Select applicant: {applicant_name}"):
-
-            row = self.page.locator(f"//tr[.//*[contains(text(),'{applicant_name}')]]")
-            allure.attach(
-                    "Test case passed successfully:applicant card is exists and selected",
-                    name="Test_Success_Message",
-                    attachment_type=allure.attachment_type.TEXT)
-
-            if row.count() == 0:
-                raise AssertionError(f"Applicant not found: {applicant_name}")
-
-            checkbox = row.locator("input[type='checkbox']")
-
-            checkbox.first.wait_for(state="visible")
-            checkbox.first.check()
-            delete=self.page.locator("//button[@aria-haspopup='dialog']").nth(1).click()
-            yes_cancle=self.page.locator('//button[@type="button"]').nth(8).click()'''

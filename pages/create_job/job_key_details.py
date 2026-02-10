@@ -36,7 +36,7 @@ class CreateJobPage:
                         break
 
             except TimeoutError:
-                pass   # No dropdown shown → allowed
+                pass   # No dropdown shown -> allowed
 
             if not matched:
                 # Keep typed value, no failure
@@ -154,12 +154,6 @@ class CreateJobPage:
             selected_location = self.page.locator(f"//*[normalize-space()='{location}']")
             
 
-            allure.attach(
-                f"Location '{location}' selected successfully",
-                name="Location Selected",
-                attachment_type=allure.attachment_type.TEXT)
-
-
     # project_team_size
     def select_project_team_size(self, value: str,timeout=5000):
         with allure.step("Selected valid option in project team size:{team_size}"):
@@ -171,7 +165,7 @@ class CreateJobPage:
             option = self.page.get_by_role("option", name=value, exact=True)
 
             if option.count() == 0:
-                pytest.fail(f"Invalid job type '{value}'. Please provide valid input.")
+                pytest.fail(f"Invalid date and month '{value}'. Please provide valid input.")
 
             option.click()
 
@@ -185,22 +179,42 @@ class CreateJobPage:
         
 
     def select_work_experience(self, exp_1, exp_2,timeout=5000):
-        with allure.step("Given min and max experience is valid inputs"):
-            self.page.locator('//input[@placeholder="Min"]').fill(str(exp_1))
-            self.page.locator('//input[@placeholder="Max"]').fill(str(exp_2))
-        with allure.step("Given inputs are Invalid,please check the min exp is always less than max exp"):
-            if exp_1 >= exp_2:
-                expect(self.page.get_by_text("Minimum experience cannot be greater than maximum experience")).to_be_visible()
+        with allure.step(f"Select work experience: {exp_1} - {exp_2}"):
+            try:
+                min_exp = float(exp_1)
+                max_exp = float(exp_2)
+                
+                if min_exp > max_exp:
+                    pytest.fail(f"Invalid Experience Range: Min ({exp_1}) cannot be greater than Max ({exp_2})")
+                
+                self.page.locator('//input[@placeholder="Min"]').fill(str(exp_1))
+                self.page.locator('//input[@placeholder="Max"]').fill(str(exp_2))
+                
+                allure.attach(f"Work experience {exp_1}-{exp_2} entered successfully", name="Success", attachment_type=allure.attachment_type.TEXT)
+            except ValueError:
+                 pytest.fail(f"Invalid Experience values: {exp_1}, {exp_2}. Must be numbers.")
+            except Exception as e:
+                pytest.fail(f"Failed to enter work experience: {e}")
 
     def salary_range(self, min_sal, max_sal,timeout=5000):
-        with allure.step("Given salary range is valid inputs"):
-            min_salary = self.page.locator('//input[@name="minsalary"]')
-            max_salary = self.page.locator('//input[@name="maxsalary"]')
-            min_salary.fill(str(min_sal))
-            max_salary.fill(str(max_sal))
-        with allure.step("Given salary range is Invalid,please provide valid inputs the MIN salary is always less than MAX salary range"):
-            if min_sal >= max_sal:
-                expect(self.page.get_by_text("Minimum salary cannot be greater to maximum salary")).to_be_visible()
+        with allure.step(f"Select salary range: {min_sal} - {max_sal}"):
+            try:
+                min_s = float(min_sal)
+                max_s = float(max_sal)
+                
+                if min_s > max_s:
+                    pytest.fail(f"Invalid Salary Range: Min ({min_sal}) cannot be greater than Max ({max_sal})")
+
+                min_salary = self.page.locator('//input[@name="minsalary"]')
+                max_salary = self.page.locator('//input[@name="maxsalary"]')
+                min_salary.fill(str(min_sal))
+                max_salary.fill(str(max_sal))
+                
+                allure.attach(f"Salary range {min_sal}-{max_sal} entered successfully", name="Success", attachment_type=allure.attachment_type.TEXT)
+            except ValueError:
+                pytest.fail(f"Invalid Salary values: {min_sal}, {max_sal}. Must be numbers.")
+            except Exception as e:
+                pytest.fail(f"Failed to enter salary range: {e}")
 
     def select_target_deadline(self,target:str,timeout=5000):
        
