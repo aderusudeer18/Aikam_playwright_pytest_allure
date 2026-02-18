@@ -7,7 +7,7 @@ class AIDescriptionPage:
 
     def write_with_Ai(self,timeout=5000):
         with allure.step("Enter into the Job description page and clicked on write with Ai button"):
-            ai_btn = self.page.locator("//button[contains(.,'Write with AI')]")
+            ai_btn = self.page.get_by_role("button", name="Write with AI")
             expect(ai_btn).to_be_visible(timeout=5000)
             expect(ai_btn).to_be_enabled()
             ai_btn.click()
@@ -18,9 +18,9 @@ class AIDescriptionPage:
 
     def select_Ai_description(self,message,timeout=12000):
         with allure.step("Input has passed to LLM to generate description"):
-            prompt =self.page.locator("//textarea[@placeholder='Enter your prompt']")
+            prompt = self.page.get_by_placeholder("Enter your prompt")
             prompt.fill(str(message))
-            generate_Ai=self.page.locator("//button[contains(text(),'Generate with AI')]")
+            generate_Ai = self.page.get_by_role("button", name="Generate with AI")
             generate_Ai.click()
             allure.attach(
                     "Test case passed successfully:Ai generated description for job ",

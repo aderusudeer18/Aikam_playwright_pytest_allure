@@ -3,7 +3,7 @@ from playwright.sync_api import sync_playwright ,expect
 import allure 
 import pytest
 import time
-from datetime import datetime
+import re
 
 from conftest import page
 
@@ -16,13 +16,37 @@ class Allapplicant:
     def import_resumes(self,timeout=18000):
         with allure.step("verify resumes has been imported"):
 
-            import_resume=self.page.locator("//span[contains(text(),'Import Resumes')]").click()
+            # Refactored: Use a robust locator for the "Import Resumes" button
+            import_resume = self.page.get_by_role("button", name="Import Resumes")
+            if not import_resume.is_visible():
+                import_resume = self.page.get_by_text("Import Resumes", exact=True).locator("xpath=ancestor::button")
+            
+            if not import_resume.is_visible():
+                 import_resume = self.page.locator("//span[contains(text(),'Import Resumes')]")
+
+            # Use an aggressive click strategy
+            try:
+                import_resume.click(timeout=5000)
+            except Exception:
+                try:
+                    import_resume.click(force=True, timeout=5000)
+                except Exception:
+                    self.page.evaluate("el => el.click()", import_resume)
             self.page.set_input_files('input[type="file"]',[r"C:\Users\Sudeer\Downloads\Aikam_Rakesh_Mekala_Resume (1).pdf",
                                                             r"C:\Users\Sudeer\Downloads\Aikam_FAKHRUDDIN_SHAIK_Resume.pdf",
                                                             r"C:\Users\Sudeer\Downloads\Aikam_SURESH_PAGAR_Resume.pdf",
                                                             r"C:\Users\Sudeer\Downloads\Aikam_RAHUL_KUMAR_Resume.pdf"])
 
-            self.page.wait_for_selector("//button[contains(text(),'Import')]").click()
+            # Refactored: More robust final "Import" button click inside the dialog
+            import_btn_final = self.page.get_by_role("button", name=re.compile(r"^Import$", re.I))
+            if import_btn_final.count() == 0:
+                # Fallback to text-based if role fails
+                import_btn_final = self.page.locator("button:has-text('Import')").filter(has_text=re.compile(r"^Import$", re.I))
+            
+            if import_btn_final.count() > 1:
+                import_btn_final = import_btn_final.first
+                
+            import_btn_final.click()
             self.page.wait_for_timeout(20000)
             success_toast = self.page.locator("//p[contains(text(),'resumes have been successfully imported')]").first
             error_toast = self.page.locator("//h3[contains(text(),'Resume Upload Failed')]").first

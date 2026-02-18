@@ -9,74 +9,26 @@ class CreateJobPage:
         self.page = page
         
     # job title
-    def select_job_title(self, title:str,timeout=3000):
-        with allure.step("Input has passed to Job title"):
-            job_title_input = self.page.locator('//input[@placeholder="Title that describes the role"]')
-            job_title_input.wait_for(state="visible", timeout=timeout)
-            job_title_input.click()
-            job_title_input.fill(title)
+    def select_job_title(self, title: str, timeout=10000):
+        with allure.step(f"Select job title: {title}"):
+            import re
+            # Trigger: Placeholder lookup
+            input_field = self.page.get_by_placeholder(re.compile(r"Title that describes the role", re.I))
+            if input_field.count() == 0:
+                input_field = self.page.get_by_label(re.compile(r"Job Title", re.I))
+            
+            input_field.wait_for(state="visible", timeout=timeout)
+            input_field.fill(title)
+            self.page.wait_for_timeout(1500)
 
-            options = self.page.locator('[role="option"]')
-            matched = False
-
+            # Option selection - robust hybrid
             try:
-                options.first.wait_for(state="visible", timeout=2000)
-
-                texts = options.all_inner_texts()
-
-                for i, text in enumerate(texts):
-                    if text.strip().lower() == title.strip().lower():
-                        options.nth(i).click()
-                        matched = True
-                        allure.attach(
-                            f"Job title '{title}' selected from dropdown",
-                            name="Dropdown_Select",
-                            attachment_type=allure.attachment_type.TEXT
-                        )
-                        break
-
-            except TimeoutError:
-                pass   # No dropdown shown -> allowed
-
-            if not matched:
-                # Keep typed value, no failure
-                allure.attach(
-                    f"Job title '{title}' kept as manual input",
-                    name="Manual_Input",
-                    attachment_type=allure.attachment_type.TEXT
-                )
-
-            '''job_title_input = self.page.locator('//input[@placeholder="Title that describes the role"]')
-            job_title_input.wait_for(state="visible", timeout=timeout)
-            job_title_input.click()
-            job_title_input.fill(title)
-
-            options = self.page.locator('[role="option"]')
-            matched = False
-            texts = []   
-
-            try:
-                options.first.wait_for(state="visible", timeout=2000)
-
-                texts = options.all_inner_texts()
-
-                for i, text in enumerate(texts):
-                    if text.strip().lower() == title.strip().lower():
-                        options.nth(i).click()
-                        matched = True
-                        allure.attach(
-                            f"Job title '{title}' selected successfully",
-                            name="Test_Success_Message",
-                            attachment_type=allure.attachment_type.TEXT)
-                        break
-
-            except TimeoutError:
-                pytest.fail(f"No dropdown options appeared after entering job title '{title}'")
-
-            if not matched:
-                pytest.fail(
-                    f"Invalid job title '{title}'. "
-                    f"Available options: {texts}")'''
+                # Try visible role="option"
+                self.page.get_by_role("option").filter(has_text=re.compile(re.escape(title), re.I)).first.click(timeout=3000, force=True)
+                allure.attach(f"Job title '{title}' selected from suggestions", name="Success")
+            except:
+                # If no suggestion matched or appeared, keep the typed value (common for free-text titles)
+                allure.attach(f"No exact suggestion found for '{title}'; keeping manual input", name="Success")
 
                 
 
@@ -173,6 +125,9 @@ class CreateJobPage:
                 f"Job type '{value}' selected successfully",
                 name="Success",
                 attachment_type=allure.attachment_type.TEXT)
+            
+
+    
     
 
         

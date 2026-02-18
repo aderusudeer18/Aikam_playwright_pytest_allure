@@ -8,21 +8,7 @@ class LoginPage:
     def open(self):
         self.page.goto("https://app.aikam.ai/")
 
-    '''def login_invald_email(self, email, password):
-        with allure.step("Login with invalid email"):
-            self.page.wait_for_selector('//input[@type="email"]').type(email)
-            self.page.wait_for_selector('//input[@type="password"]').type(password)
-            self.page.wait_for_selector('//div[text()="Login"]').click()
-            error =self.page.get_by_text("Please enter a valid email address")
-            expect(error).to_be_visible(timeout=5000)
     
-    def login_invalid_password(self, email, password):
-        with allure.step("Login with invalid invalid password"):
-            self.page.wait_for_selector('//input[@type="email"]').type(email)
-            self.page.wait_for_selector('//input[@type="password"]').type(password)
-            self.page.wait_for_selector('//div[text()="Login"]').click()
-            error =self.page.get_by_text("Invalid email or password")
-            expect(error).to_be_visible(timeout=5000)'''
     
     def verify_forget_password(self,type_email):
         with allure.step("Verify forget password link sent user"):

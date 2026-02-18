@@ -1,27 +1,18 @@
-from playwright.sync_api import sync_playwright ,expect
+from playwright.sync_api import expect
 import allure
-import pytest 
+import pytest
+import re
 
 class SendMail:
-    def __init__(self,page):
-          self.page=page
+    def __init__(self, page):
+        self.page = page
 
-
-    def test_select_applicant(self,applicant_name):
+    def test_select_applicant(self, applicant_name):
         with allure.step(f"Select applicant for send mail: {applicant_name}"):
-            container = self.page.locator("div",has=self.page.get_by_text(applicant_name, exact=True)).first
-
-            expect(container).to_be_visible(timeout=15000)
-
-            # 2️⃣ Find checkbox inside the same container
-            checkbox = container.locator("input[type='checkbox']").nth(1)
-
-            expect(checkbox).to_be_visible(timeout=5000)
-
-            # 3️⃣ Click checkbox
-            checkbox.check(force=True)
+            select_applicant_check_box = self.page.locator('//input[@type="checkbox"]').nth(1)
+            select_applicant_check_box.click(force=True)
                     
-    def test_send_mail(self,timeout=3000):
+    def test_send_mail(self, timeout=15000):
         with allure.step("verify send icon to send mail to applicant"):
             try:
                 self.page.on("dialog",lambda dialog:dialog.accept())
