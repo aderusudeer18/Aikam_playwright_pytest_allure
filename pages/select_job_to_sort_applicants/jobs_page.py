@@ -14,23 +14,30 @@ class JobsPage:
             self.page.locator('//input[@placeholder="Search"]').fill(job_id)
             self.page.wait_for_timeout(500)  
 
-            job_row = self.page.locator("a.text-primary", has_text=job_title)
+            # Locate the specific job card containing the Job ID
+            job_card = self.page.locator("div", has=self.page.get_by_text(job_id)).first
+            
+            # Locate the View Job button inside the card
+            view_job_btn = job_card.locator('//button[contains(text(),"View Job")]').first
 
-            if job_row.count() > 0:
-                job_row.first.scroll_into_view_if_needed()
-                job_row.first.click()
+            if view_job_btn.count() > 0:
+                view_job_btn.scroll_into_view_if_needed()
+                view_job_btn.click()
                 allure.attach(
-                    "Test case passed successfully:job is visible and clickable",
+                    "Test case passed successfully: View Job button clicked",
                     name="Test_Success_Message",
                     attachment_type=allure.attachment_type.TEXT)
             else:
-                raise AssertionError(f" Job not found. Job ID: {job_id}, Job Title: {job_title}")
+                raise AssertionError(f" Job not found or View Job button missing. Job ID: {job_id}, Job Title: {job_title}")
 
 
-
-    '''def verify_job_created(self, job_title):
-        with allure.step("Verify created job appears in Jobs list"):
-            self.page.reload()
-            job_row = self.page.locator("a.text-primary", has_text=job_title).first
-            expect(job_row).to_be_visible(timeout=15000)
-            job_row.click()'''
+    def view_applicant_btn(self,timeout=2000):
+        with allure.step("view applicant button is visible and clickable"):
+            view_btn=self.page.locator('//button[contains(text(),"View Applicants")]')
+            view_btn.wait_for(timeout=timeout)
+            expect(view_btn).to_be_visible()
+            allure.attach(
+                "Test case passed successfully:view applicant button is visible and clickable",
+                name="Test_Success_Message",
+                attachment_type=allure.attachment_type.TEXT)
+    

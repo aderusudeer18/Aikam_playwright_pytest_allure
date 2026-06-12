@@ -9,30 +9,34 @@ from pages.login_advance_filters_applicant_page.all_applicant_advance_filters_pa
 def test_login_to_applicant_page(page):
     login = LoginPage(page)
     login.open()
-    login.login_with_credentials("liliya.moka@symphonize.com", "Aikam@123") 
+    login.login_with_credentials("liliya.moka@symphonize.com", "Liliya@5") 
 
     dashboard=DashboardPage(page)
     dashboard.job_icon()
 
     jobs_page=JobsPage(page)
-    '''jobs_page.verify_job_title("Job Title","Python developer","Sym0071")
-    jobs_page.verify_job_Client("Client","symphonize","Sym0754")
+    jobs_page.verify_job_title("Sym0993")
+    '''jobs_page.verify_job_Client("Client","symphonize","Sym0754")
     jobs_page.verify_job_location("Location","vijayawada","Sym0755")
     jobs_page.verify_job_posted_on("Posted on","09 jan 2026")
     jobs_page.verify_job_Target_deadline("Target Deadline","31 Mar 2026")'''
-    jobs_page.verify_job_id("Sym0071","Python developer")
+    #jobs_page.verify_job_id("Sym0373","Python developer")
 
 
-    view_btn=ViewJob(page)
-    #view_btn.import_resumes()
-    view_btn.view_job() 
+    view_applicant_btn=ViewJob(page)
+    view_applicant_btn.view_job()
+
+
+
+    
 
     all_applicant=Allapplicant(page)
     all_applicant.import_resumes()
+    all_applicant.export_excel_btn()
 
-    all_applicant.advance_filters("Google Ads","Meta Ads","Retargeting Strategies","mekalarakesh26102000@gmail.com","9515798304","Hyderabad","Bengaluru","25")
+    all_applicant.advance_filters("Salesforce Administration","CRM Tool","Jira, Data Analysis","madhurikandregula66@gmail.com","7702214594","Hyderabad","Bengaluru","25")
 
-    all_applicant.verify_applicant_filtered("Rakesh Mekala")
+    all_applicant.verify_applicant_filtered("HEMA MADHURI")
 
     all_applicant.verify_advance_filters_mails_sent_list("Senior Software Developer","MGS Technologies Pvt Ltd")
     all_applicant.verify_advance_filters_given_mails_list("B.Tech","Srinivasa Engineering College","Computer Science & Information Technology")

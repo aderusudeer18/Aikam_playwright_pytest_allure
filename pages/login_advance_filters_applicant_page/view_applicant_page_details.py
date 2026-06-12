@@ -12,6 +12,7 @@ class ViewJob:
             btn = self.page.locator("//p[contains(text(),'View Applicants')]")
             expect(btn).to_be_visible(timeout=2000)
             btn.click()
+            expect(btn).to_be_hidden(timeout=10000)
             allure.attach(
                 "Test case passed successfully:view applicant button is clicked",
                 name="Test_Success_Message",

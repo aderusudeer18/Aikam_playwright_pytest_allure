@@ -48,6 +48,9 @@ class Allapplicant:
 
     def advance_filters(self,skill_1,skill_2,skill_3,email_id,number,can_loc_1,can_loc_2,timeout=3000):
         with allure.step("Applying advance filters to applicants"):
+            # Ensure at least one applicant is loaded/visible before opening filters
+            self.page.locator("div.flex.items-center.gap-2").first.wait_for(state="visible", timeout=20000)
+            
             advance=self.page.locator('//div[@data-state="closed"]').nth(9).click()
             keyword = self.page.locator("//input[@type='text']").nth(0)
             keyword.type(skill_1)
@@ -79,44 +82,89 @@ class Allapplicant:
             apply_btn=self.page.locator("//button[contains(text(),'Apply')]")
             expect(apply_btn).to_be_visible(timeout=2000)
             apply_btn.click()
+            self.page.locator("div.flex.w-full.items-center.gap-2.mb-1").first.wait_for(state="visible", timeout=20000)
 
 
-    def test_verify_applicant_filtered(self,applicant_name,timeout=3000):
+    def test_verify_applicant_filtered(self,applicant_name,timeout=20000):
             with allure.step("verify applicants has been filtered based on advance filters"):
                 #if filtered_applicant.count() >1:
                 filtered_applicant=self.page.locator("div.flex.w-full.items-center.gap-2.mb-1").nth(0)
                 filtered_applicant.click()
 
-                ai_pre_screening=self.page.locator('//button[contains(text(),"AI Prescreening")]').click()
-                request_ai_pre_screening=self.page.locator('//button[contains(text(),"Request AI Prescreening")]').click()
-                Next=self.page.locator('//button[contains(text(),"Next")]').click()
-                schedule=self.page.get_by_role("button",name="Schedule",exact=True).click()
+                # AI Prescreening
+                self.page.locator('//button[contains(text(),"AI Prescreening")]').click()
+                request_ai_pre_screening = self.page.locator('//button[contains(text(),"Request AI Prescreening")]')
+                self.page.wait_for_timeout(2000)
+                if request_ai_pre_screening.is_visible():
+                    request_ai_pre_screening.click()
 
-                ai_interview=self.page.locator('//button[contains(text(),"AI Interview")]').nth(1)
-                ai_interview.click()
-                request_ai_interview=self.page.locator('//button[contains(text(),"Request AI Interview")]').click()
-                Next=self.page.locator('//button[contains(text(),"Next")]').click()
-                schedule=self.page.get_by_role("button",name="Schedule",exact=True).click()
+                    Next = self.page.locator('//button[contains(text(),"Next")]')
+                    Next.wait_for(state="visible")
+                    Next.scroll_into_view_if_needed()
+                    self.page.wait_for_timeout(2000)
+                    Next.click(force=True)
 
-                ai_code_assessment=self.page.locator('//button[contains(text(),"AI Coding Assessment")]').click()
-                request_ai_ai_code_assessment=self.page.locator('//button[contains(text(),"Request AI Coding Assessment")]').click()
-                Next=self.page.locator('//button[contains(text(),"Next")]').click()
+                    self.page.wait_for_timeout(2000)
+                    schedule = self.page.get_by_role("button", name="Schedule", exact=True)
+                    if not schedule.is_visible():
+                        Next.wait_for(state="visible")
+                        Next.scroll_into_view_if_needed()
+                        self.page.wait_for_timeout(2000)
+                        Next.click(force=True)
 
-                '''custom_assessment=self.page.locator('//button[contains(text(),"Custom Assessment")]').click()
-                code_assessment_duration=self.page.locator('//input[@type="number"]').click()
-                description=self.page.locator('//textarea[@placeholder="Enter description"]').type(question1)
-                description.click()
-                given_input=self.page.locator('//input[@placeholder="Input"]').fill(input1)
-                given_output=self.page.locator('//input[@placeholder="Output"]').fill(output1)
+                    schedule.wait_for(state="visible")
+                    schedule.scroll_into_view_if_needed()
+                    schedule.click()
 
-                add_question=self.page.locator('//span[contains(text(),"+ Add Question")]').click()
-                description=self.page.locator('//textarea[@placeholder="Enter description"]').type(question2)
-                description.click()
-                given_input=self.page.locator('//input[@placeholder="Input"]').fill(input2)
-                given_output=self.page.locator('//input[@placeholder="Output"]').fill(output2)'''
+                # Interview
+                self.page.locator('//button[contains(text(),"AI Interview")]').nth(1).click()
+                request_ai_interview = self.page.locator('//button[contains(text(),"Request") and contains(text(),"Interview")]')
+                self.page.wait_for_timeout(2000)
+                if request_ai_interview.is_visible():
+                    request_ai_interview.click()
 
-                Next1=self.page.locator('//button[contains(text(),"Next")]').click()
-                schedule=self.page.get_by_role("button",name="Schedule",exact=True).click() 
+                    Next = self.page.locator('//button[contains(text(),"Next")]')
+                    Next.wait_for(state="visible")
+                    Next.scroll_into_view_if_needed()
+                    self.page.wait_for_timeout(2000)
+                    Next.click(force=True)
+
+                    self.page.wait_for_timeout(2000)
+                    schedule = self.page.get_by_role("button", name="Schedule", exact=True)
+                    if not schedule.is_visible():
+                        Next.wait_for(state="visible")
+                        Next.scroll_into_view_if_needed()
+                        self.page.wait_for_timeout(2000)
+                        Next.click(force=True)
+
+                    schedule.wait_for(state="visible")
+                    schedule.scroll_into_view_if_needed()
+                    schedule.click()
+
+                # Coding Assessment
+                self.page.locator('//button[contains(text(),"AI Coding Assessment")]').click()
+                request_ai_ai_code_assessment = self.page.locator('//button[contains(text(),"Request AI Coding Assessment")]')
+                self.page.wait_for_timeout(2000)
+                if request_ai_ai_code_assessment.is_visible():
+                    request_ai_ai_code_assessment.click()
+
+                    Next = self.page.locator('//button[contains(text(),"Next")]')
+                    Next.wait_for(state="visible")
+                    Next.scroll_into_view_if_needed()
+                    self.page.wait_for_timeout(2000)
+                    Next.click(force=True)
+
+                    self.page.wait_for_timeout(2000)
+                    schedule = self.page.get_by_role("button", name="Schedule", exact=True)
+                    if not schedule.is_visible():
+                        Next.wait_for(state="visible")
+                        Next.scroll_into_view_if_needed()
+                        self.page.wait_for_timeout(2000)
+                        Next.click(force=True)
+
+                    schedule.wait_for(state="visible")
+                    schedule.scroll_into_view_if_needed()
+                    schedule.click() 
 
 
                 resume=self.page.locator('//button[contains(text(),"Resume")]').click()

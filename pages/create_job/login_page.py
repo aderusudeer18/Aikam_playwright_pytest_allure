@@ -7,7 +7,7 @@ class LoginPage:
         self.page = page
 
     def open(self):
-        self.page.goto("https://app.aikam.ai/")
+        self.page.goto("https://aikam-app-qa-793571778940.asia-south1.run.app/")
 
     def login_invald_email(self, email, password):
         with allure.step("Login with invalid email"):
@@ -37,7 +37,7 @@ class LoginPage:
 
     def login(self, email, password):
         with allure.step("Login with valid email and password"):
-            self.page.wait_for_selector('//input[@type="email"]').fill(email)
+            self.page.wait_for_selector('//input[@id="email"]').fill(email)
             self.page.wait_for_selector('//input[@type="password"]').fill(password)
             self.page.wait_for_selector('//div[text()="Login"]').click()
             
@@ -48,7 +48,6 @@ class LoginPage:
             except Exception as e:
                 # Screenshot handled by conftest
                 
-                # Check if an error message is visible to provide a clearer error
                 error_msg = self.page.locator("text=Invalid email or password")
                 if error_msg.is_visible():
                      raise Exception(f"Login failed: '{error_msg.inner_text()}' message displayed.")

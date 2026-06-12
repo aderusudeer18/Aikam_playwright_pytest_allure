@@ -9,24 +9,22 @@ class JobsPage:
         self.page = page
 
 
-    def verify_job_title(self,title,job_title,job_id,timeout=2000):
+    def verify_job_title(self,job_id,timeout=2000):
         with allure.step("verify filter using Job title"):
-            select_job_title = self.page.locator('//button[@role="combobox"]')
-            select_job_title.wait_for(state="visible")
-            select_job_title.click()
-
-            option = self.page.get_by_role("option", name=title)
-            option.wait_for(state="visible")
-            option.click()
+    
 
             search = self.page.locator('//input[@placeholder="Search"]')
             search.wait_for(state="visible")
-            search.fill(job_title)
+            search.fill(job_id)
+            
+            job_card = self.page.locator("div", has=self.page.get_by_text(job_id)).first
+            job_card.wait_for(state="visible", timeout=5000)
+            
+            view_job_btn = job_card.locator('//button[contains(text(),"View Job")]').first
+            view_job_btn.click()
 
-            row = self.page.locator("tr", has_text=job_id)
+            '''row = self.page.locator("tr", has_text=job_id)
 
-            if row.count() == 0:
-                pytest.fail(f"Job ID {job_id} not found after searching title {job_title}")
 
             three_dots = row.locator("//button[@aria-haspopup='menu']")
             three_dots.wait_for(state="visible")
@@ -36,6 +34,9 @@ class JobsPage:
             select_option.click()
             confirn_inactive=self.page.locator('//button[contains(text(),"Inactive")]')
             confirn_inactive.click()
+            view_job_btn=self.page.locator('//button[contains(text(),"View Job")]').nth(0)
+            view_job_btn.click()'''
+
 
             allure.attach(
                     "Test case passed successfully:jobs displayed using job title",
@@ -155,7 +156,6 @@ class JobsPage:
     def verify_job_id(self,job_id,job_title,timeout=4000):
         with allure.step("Verify job by job_id in Jobs page"):
 
-            self.page.locator('//input[@placeholder="Search"]').fill(job_id)
             self.page.locator('//input[@placeholder="Search"]').fill(job_id)
             
             job_row = self.page.locator("a.text-primary", has_text=job_title)

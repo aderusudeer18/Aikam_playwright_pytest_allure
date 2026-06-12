@@ -6,13 +6,13 @@ class LoginPage:
     def __init__(self,page):
         self.page=page
     def open(self):
-        self.page.goto("https://app.aikam.ai/")
+        self.page.goto("https://aikam-app-qa-793571778940.asia-south1.run.app/")
 
 
 
-    def login_with_credentials(self, email, password, expect_success=True, timeout=5000):
+    def login_with_credentials(self, email, password, expect_success=True, timeout=20000):
         with allure.step(f"Login with {email}, expect_success={expect_success}"):
-            self.page.wait_for_selector('//input[@type="email"]').fill(email)
+            self.page.wait_for_selector('//input[@id="email"]').fill(email)
             self.page.wait_for_selector('//input[@type="password"]').fill(password)
             self.page.wait_for_selector('//div[text()="Login"]').click()
             

@@ -12,7 +12,7 @@ class AllApplicant:
         with allure.step("search by name or email,Phone number"):
             self.page.locator("div.cursor-pointer svg.lucide-search").click()
             self.page.wait_for_timeout(1000)
-            search_name=self.page.locator('//input[@type="text"]')
+            search_name = self.page.get_by_placeholder("Search by name, email, phone number")
             search_name.fill(applicant_name)
             result = self.page.locator(f"text={applicant_name}")
             if result.count() > 0:
@@ -92,7 +92,7 @@ class AllApplicant:
             self.page.reload()
             self.page.locator("div.cursor-pointer svg.lucide-search").click()
             self.page.wait_for_timeout(1000)
-            search_name=self.page.locator('//input[@type="text"]')
+            search_name = self.page.get_by_placeholder("Search by name, email, phone number")
             search_name.fill(applicant_name1)
             result = self.page.locator(f"text={applicant_name1}")
             if result.count() > 0:
@@ -133,7 +133,7 @@ class AllApplicant:
             self.page.reload()
             self.page.locator("div.cursor-pointer svg.lucide-search").click()
             self.page.wait_for_timeout(1000)
-            search_name=self.page.locator('//input[@type="text"]')
+            search_name = self.page.get_by_placeholder("Search by name, email, phone number")
             search_name.fill(applicant_name2)
             result = self.page.locator(f"text={applicant_name2}")
             if result.count() > 0:
@@ -175,7 +175,7 @@ class AllApplicant:
             self.page.reload()
             self.page.locator("div.cursor-pointer svg.lucide-search").click()
             self.page.wait_for_timeout(1000)
-            search_name=self.page.locator('//input[@type="text"]')
+            search_name = self.page.get_by_placeholder("Search by name, email, phone number")
             search_name.fill(applicant_name3)
             result = self.page.locator(f"text={applicant_name3}")
             if result.count() > 0:
@@ -231,7 +231,7 @@ class AllApplicant:
             self.page.reload()
             self.page.locator("div.cursor-pointer svg.lucide-search").click()
             self.page.wait_for_timeout(1000)
-            search_name=self.page.locator('//input[@type="text"]')
+            search_name = self.page.get_by_placeholder("Search by name, email, phone number")
             search_name.fill(applicant_name4)
             result = self.page.locator(f"text={applicant_name4}")
             if result.count() > 0:

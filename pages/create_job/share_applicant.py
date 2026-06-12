@@ -9,16 +9,16 @@ class ShareApplicant:
     
     def test_select_applicant(self,applicant_name):
         with allure.step("verify send mail to applicant"):
-            container = self.page.locator("div",has=self.page.get_by_text(applicant_name, exact=True)).first
+            container = self.page.locator("button", has_text=applicant_name).first
             expect(container).to_be_visible(timeout=15000)
-            checkbox = container.locator("input[type='checkbox']").nth(1)
+            checkbox = container.get_by_role("checkbox").first
             expect(checkbox).to_be_visible(timeout=5000)
-            checkbox.check(force=True)
+            checkbox.click()
 
     def test_share_applicant(self, email="aderu.sudeer@gmail.com", timeout=3000):
         with allure.step("verify share applicant button is visible to share applicant details"):
             try:
-                self.page.locator("//div[@data-state='closed']").nth(6).click()
+                self.page.locator('button:has(svg.lucide-send)').first.click()
                 email_input = self.page.get_by_placeholder("Enter email and press Enter")
                 email_input.wait_for(state="visible", timeout=3000)
                 email_input.fill(email)
