@@ -13,11 +13,18 @@ class ImportResume:
             import_resume=self.page.locator("//span[contains(text(),'Import Resumes')]")
             import_resume.click()
             
-            resume_path = os.path.join(os.path.expanduser("~"), "Downloads", "LILIYA_MOKA_Resume.pdf")
+            resume_path = os.path.join(os.path.expanduser("~"), "Downloads", "Aikam_A.Balaji_Resume.pdf")
             
             try:
                 self.page.set_input_files('input[type="file"]', resume_path)
                 self.page.wait_for_selector("//button[contains(text(),'Import')]").click()
+                
+                # Wait for 2 minutes for processing
+                self.page.wait_for_timeout(120000)
+                
+                # Reload the page to make the applicant visible
+                self.page.wait_for_timeout(5000)
+                
                 applicant_locator=self.page.locator(f"text={applicant_name}")
                 expect(applicant_locator).to_be_visible(timeout=70000)
             except Exception as e:
@@ -29,8 +36,8 @@ class ImportResume:
         
                     page_text = self.page.inner_text("body")
                     allure.attach(page_text, name="Page_Text_Debug", attachment_type=allure.attachment_type.TEXT)
-                    pytest.fail(f"Resume verification failed. Expected '{applicant_name}' to be visible. Error: {e}")
-            
+                    pytest.fail(f"Resume verification failed. Expected '{applicant_name}' to be visible. Error: {e}") 
+
             self.page.reload() 
 
    

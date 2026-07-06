@@ -6,7 +6,7 @@ class LoginPage:
         self.page = page
 
     def open(self):
-        self.page.goto("https://app.aikam.ai/")
+        self.page.goto("https://aikam-app-qa-793571778940.asia-south1.run.app/")
 
     '''def login_invald_email(self, email, password):
         with allure.step("Login with invalid email"):
@@ -42,7 +42,7 @@ class LoginPage:
 
     def login(self, email, password,timeout=2000):
         with allure.step("Login with valid email and password"):
-            self.page.wait_for_selector('//input[@type="email"]').type(email)
+            self.page.wait_for_selector('//input[@id="email"]').type(email)
             self.page.wait_for_selector('//input[@type="password"]').type(password)
             self.page.wait_for_selector('//div[text()="Login"]').click()
             allure.attach(

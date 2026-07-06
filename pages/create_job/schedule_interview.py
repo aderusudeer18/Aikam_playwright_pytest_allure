@@ -9,31 +9,14 @@ class ScheduleInterview:
     
     def test_select_applicant(self,applicant_name):
         with allure.step(f"Select applicant for interview: {applicant_name}"):
-            container = self.page.locator("div",has=self.page.get_by_text(applicant_name, exact=True)).first
+            container = self.page.locator("button", has_text=applicant_name).first
 
             expect(container).to_be_visible(timeout=15000)
-            checkbox = container.locator("input[type='checkbox']").nth(1)
+            checkbox = container.get_by_role("checkbox").first
 
             expect(checkbox).to_be_visible(timeout=5000)
-            checkbox.check(force=True)
+            checkbox.click()
 
-            '''self.page.wait_for_selector("tr, div[data-applicant]", timeout=20000)
-
-            # 2️⃣ Locate applicant row safely
-            row = self.page.locator(
-                "tr, div",
-                has=self.page.get_by_text(applicant_name, exact=True)
-            ).first
-
-            expect(row).to_be_visible(timeout=15000)
-
-            # 3️⃣ Locate checkbox ONLY inside that row
-            checkbox = row.locator("input[type='checkbox']").first
-
-            expect(checkbox).to_be_visible(timeout=5000)
-
-            # 4️⃣ Select checkbox
-            checkbox.check(force=True)'''
 
 
     def test_schedule_interview(self):
@@ -47,7 +30,11 @@ class ScheduleInterview:
                 self.page.locator("//button[contains(text(),'Next')]").click()
                 self.page.get_by_role("button", name="Next").click()
                 self.page.get_by_role("button", name="Next").click()
-                self.page.get_by_role("button", name="Schedule", exact=True).click()
+                schedule_btn = self.page.get_by_role("button", name="Schedule", exact=True)
+                schedule_btn.click()
+                schedule_btn.wait_for(state="hidden", timeout=15000)
+                self.page.wait_for_timeout(5000)
+                
                 allure.attach("Interview scheduled successfully", name="Success", attachment_type=allure.attachment_type.TEXT)
             except Exception as e:
                 pytest.fail(f"Failed to schedule interview: {e}")

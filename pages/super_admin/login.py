@@ -2,7 +2,7 @@ from playwright.sync_api import playwright, expect
 import allure
 import re
 
-class LoginPage:
+class LoginSuperadminPage:
     def __init__(self, page):
         self.page = page
 
@@ -35,7 +35,7 @@ class LoginPage:
                 # Screenshot handled by conftest
                 raise e
 
-    def login(self, email, password):
+    def login_super_admin(self, email, password):
         with allure.step("Login with valid email and password"):
             self.page.wait_for_selector('//input[@id="email"]').fill(email)
             self.page.wait_for_selector('//input[@type="password"]').fill(password)

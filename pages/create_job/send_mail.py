@@ -9,27 +9,35 @@ class SendMail:
 
     def test_select_applicant(self,applicant_name):
         with allure.step(f"Select applicant for send mail: {applicant_name}"):
-            container = self.page.locator("div",has=self.page.get_by_text(applicant_name, exact=True)).first
-
+            container = self.page.locator("button", has_text=applicant_name).first
             expect(container).to_be_visible(timeout=15000)
-
-            # 2️⃣ Find checkbox inside the same container
-            checkbox = container.locator("input[type='checkbox']").nth(1)
-
+            checkbox = container.get_by_role("checkbox").first
             expect(checkbox).to_be_visible(timeout=5000)
-
-            # 3️⃣ Click checkbox
-            checkbox.check(force=True)
+            checkbox.click()
                     
     def test_send_mail(self,timeout=3000):
         with allure.step("verify send icon to send mail to applicant"):
             try:
                 self.page.on("dialog",lambda dialog:dialog.accept())
-                self.page.locator('//div[@data-state="closed"]').nth(5).click()
+                send_mail = self.page.locator('button:has(svg.lucide-mail)').first
+                send_mail.click()
+                
+                # Handle "Email Not Integrated" modal if it appears
+                continue_btn = self.page.locator('//*[contains(text(),"Continue with aikam email")]').first
+                if continue_btn.count() > 0:
+                    try:
+                        continue_btn.wait_for(state="visible", timeout=3000)
+                        continue_btn.click()
+                    except Exception:
+                        pass
             
                 email_btn = self.page.locator("//button[contains(text(),'Send Email')]")
-                email_btn.wait_for(state="visible",timeout=2000)
+                email_btn.wait_for(state="visible",timeout=5000)
                 email_btn.click()
+                
+                # Wait for the email modal to close and the page to settle
+                email_btn.wait_for(state="hidden", timeout=15000)
+                self.page.wait_for_timeout(5000)
                 
                 allure.attach(
                         "Test case passed successfully:All the check boxs has checked",
