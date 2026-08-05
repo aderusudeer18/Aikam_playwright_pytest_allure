@@ -37,10 +37,7 @@ class LoginPage:
 
     def login(self, email, password):
         with allure.step("Login with valid email and password"):
-            self.page.locator('//input[@id="email"]').fill(email)
-            
-
-            
+            self.page.wait_for_selector('//input[@id="email"]').fill(email)
             self.page.wait_for_selector('//input[@type="password"]').fill(password)
             self.page.wait_for_selector('//div[text()="Login"]').click()
             
@@ -55,7 +52,7 @@ class LoginPage:
                 if error_msg.is_visible():
                      raise Exception(f"Login failed: '{error_msg.inner_text()}' message displayed.")
                 
-                # Otherwise re-raise the timeout
+                
                 raise e
             
             allure.attach("Login successful and redirected to Dashboard/Jobs page", name="Success", attachment_type=allure.attachment_type.TEXT)

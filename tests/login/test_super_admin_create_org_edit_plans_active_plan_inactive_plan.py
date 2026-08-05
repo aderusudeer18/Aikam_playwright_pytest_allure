@@ -10,7 +10,7 @@ def test_super_admin(page):
 
     org=DashboardPage(page)
     org.create_organization_btn()
-    org.org_details("symh","Sdeer","sudeer.aru@sympize.com","Product Based","9705653172")
+    org.org_details("ENG","sam curren","ppfylvcxys@olipii.com","Service based","97056531736")
 
     search_org=Organisation(page)
-    search_org.org_details("sudeer.aru@sympize.com", "symh")
+    search_org.org_details("olipii", "ENG")

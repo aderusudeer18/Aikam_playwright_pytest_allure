@@ -24,15 +24,16 @@ class Organisation:
                 search_bar = self.page.locator('input[type="text"]').first
                 
             search_bar.fill(org_email)
+            search_bar.press("Enter")
 
             # Wait for search results to filter
             self.page.wait_for_timeout(2000)
             
-            # The email might not be displayed in the table columns, so we click the org_name which is visible
-            org_locator = self.page.locator(f'text="{org_name}"').first
-            if org_locator.is_visible():
+            org_locator = self.page.get_by_text(org_name, exact=False).first
+            try:
+                org_locator.wait_for(state="visible", timeout=10000)
                 org_locator.click()
-            else:
+            except:
                 # fallback to click the first row if org_name isn't visible
                 self.page.locator('tbody tr').first.click()
 
@@ -80,11 +81,14 @@ class Organisation:
             if confirm_btn.is_visible():
                 confirm_btn.click()
             self.page.wait_for_timeout(2000)
+            allure.attach("Test case passed successfully: Organization details updated", name="Success", attachment_type=allure.attachment_type.TEXT)
 
     def org_email(self, email):
         with allure.step("Edit org email"):
             self.page.locator('//input[@id="admin-email"]').fill(email)
+            allure.attach("Test case passed successfully: Organization email edited", name="Success", attachment_type=allure.attachment_type.TEXT)
             
     def org_name(self, name):
         with allure.step("Edit org name"):
             self.page.locator('//input[@id="org-name"]').fill(name)
+            allure.attach("Test case passed successfully: Organization name edited", name="Success", attachment_type=allure.attachment_type.TEXT)

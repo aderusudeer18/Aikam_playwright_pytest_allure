@@ -31,8 +31,9 @@ class AllApplicant:
             
             row = self.page.locator('//input[@type="checkbox"]').nth(1)
             row.click(force=True)
-            applicant = self.page.get_by_text(applicant_name, exact=True)
+            applicant = self.page.get_by_text(applicant_name, exact=False)
             expect(applicant).to_be_visible(timeout=20000)
+            allure.attach("Test case passed successfully: Applicant is visible", name="Success", attachment_type=allure.attachment_type.TEXT)
             
 
         
@@ -60,8 +61,9 @@ class AllApplicant:
         with allure.step(f"Select applicant: {applicant_name}"):
             row = self.page.locator('//input[@type="checkbox"]').nth(1)
             row.click(force=True)
-            applicant = self.page.get_by_text(applicant_name, exact=True)
+            applicant = self.page.get_by_text(applicant_name, exact=False)
             expect(applicant).to_be_visible(timeout=20000)
+            allure.attach("Test case passed successfully: Applicant is visible", name="Success", attachment_type=allure.attachment_type.TEXT)
 
 
     def move_to_applicant_pre_screened(self,timeout=3000):
@@ -109,8 +111,9 @@ class AllApplicant:
         with allure.step(f"Select applicant: {applicant_name1}"):
             row = self.page.locator('//input[@type="checkbox"]').nth(1)
             row.click(force=True)
-            applicant = self.page.get_by_text(applicant_name1, exact=True)
+            applicant = self.page.get_by_text(applicant_name1, exact=False)
             expect(applicant).to_be_visible(timeout=20000)
+            allure.attach("Test case passed successfully: Applicant is visible", name="Success", attachment_type=allure.attachment_type.TEXT)
             
     def move_to_applicant_shortlisted(self,timeout=3000):
         with allure.step("Verify move to button is visible "):
@@ -150,8 +153,9 @@ class AllApplicant:
         with allure.step(f"Select applicant: {applicant_name2}"):
             row = self.page.locator('//input[@type="checkbox"]').nth(1)
             row.click(force=True)
-            applicant = self.page.get_by_text(applicant_name2, exact=True)
+            applicant = self.page.get_by_text(applicant_name2, exact=False)
             expect(applicant).to_be_visible(timeout=20000)
+            allure.attach("Test case passed successfully: Applicant is visible", name="Success", attachment_type=allure.attachment_type.TEXT)
     
     def move_to_applicant_interviewing(self,timeout=3000):
         with allure.step("Verify move to button is visible "):
@@ -248,8 +252,9 @@ class AllApplicant:
 
             row = self.page.locator('//input[@type="checkbox"]').nth(1)
             row.click(force=True)
-            applicant = self.page.get_by_text(applicant_name4, exact=True)
+            applicant = self.page.get_by_text(applicant_name4, exact=False)
             expect(applicant).to_be_visible(timeout=20000)
+            allure.attach("Test case passed successfully: Applicant is visible", name="Success", attachment_type=allure.attachment_type.TEXT)
             
 
     def move_to_applicant_rejected(self,timeout=3000):

@@ -1,14 +1,13 @@
-from playwright.sync_api import sync_playwright,expect 
+from playwright.sync_api import sync_playwright, expect
+import allure 
 import pytest 
-import allure
-import os
 
 
-
-class ImportResume:
+class ImportResumes:
     def __init__(self,page):
         self.page=page
-    def test_import_resumes(self, applicant_name, timeout=3000):
+
+    def test_import_resumes(self, applicant_name, timeout=2000):
         with allure.step("Verify resumes has imported "):
             import_resume=self.page.locator("//span[contains(text(),'Import Resumes')]")
             import_resume.click()
@@ -40,7 +39,3 @@ class ImportResume:
                     pytest.fail(f"Resume verification failed. Expected '{applicant_name}' to be visible. Error: {e}") 
 
             self.page.reload() 
-
-   
-
-

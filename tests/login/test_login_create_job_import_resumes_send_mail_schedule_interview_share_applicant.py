@@ -18,7 +18,7 @@ def test_login_valid_credtionals(page):
     
     login = LoginPage(page)
     login.open()
-    login.login("liliya.moka@symphonize.com", "Liliya@5") 
+    login.login("snigdha.dalavai@symphonize.com", "Symphonize8*") 
 
     dashboard=DashboardPage(page)
     dashboard.job_icon()

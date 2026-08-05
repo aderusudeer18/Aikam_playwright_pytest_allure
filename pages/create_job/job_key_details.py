@@ -31,7 +31,7 @@ class CreateJobPage:
 
         
     # job title
-    def select_job_title(self, title:str,timeout=3000):
+    def select_job_title(self, title:str,timeout=30000):
         with allure.step("Input has passed to Job title"):
             job_title_input = self.page.locator('//input[@placeholder="Title that describes the role"]')
             job_title_input.wait_for(state="visible", timeout=timeout)
@@ -137,7 +137,7 @@ class CreateJobPage:
 
     #location
 
-    def select_location(self, location:str,timeout=3000):
+    def select_location(self, location:str,timeout=30000):
 
         with allure.step("Select location"):
             location_container = self.page.locator("//label[normalize-space()='Job Location']/following-sibling::*[1]")

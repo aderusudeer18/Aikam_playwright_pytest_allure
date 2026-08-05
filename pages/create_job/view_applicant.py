@@ -17,7 +17,7 @@ class ViewJob:
                     name="Test_Success_Message",
                     attachment_type=allure.attachment_type.TEXT)
             else:
-                assert False, "View Applicants button not found or not visible on the page"
+                pytest.fail("View Applicants button not found or not visible on the page")
 
                 
             

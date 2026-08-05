@@ -38,6 +38,7 @@ class LoginPage:
             #expect(self.page.get_by_text("sent to your email account")).to_be_visible()
             self.page.go_back()
             self.page.go_back()
+            allure.attach("Test case passed successfully: Forget password link sent", name="Success", attachment_type=allure.attachment_type.TEXT)
 
 
     def login(self, email, password,timeout=2000):

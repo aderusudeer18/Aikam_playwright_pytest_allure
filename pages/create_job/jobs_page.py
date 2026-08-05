@@ -10,8 +10,12 @@ class JobsPage:
 
     def wait_until_jobs_page(self):
         with allure.step("Wait until redirected and Jobs page is ready"):
-            self.page.get_by_text("Jobs Control Center")
-            self.jobs_list.first.wait_for(state="visible", timeout=20000)
+            try:
+                self.page.get_by_text("Jobs Control Center")
+                self.page.wait_for_selector('//input[@placeholder="Search Job Title"]', state="visible", timeout=20000)
+                allure.attach("Test case passed successfully: Redirected to Jobs page", name="Success", attachment_type=allure.attachment_type.TEXT)
+            except Exception as e:
+                pytest.fail(f"Failed to load Jobs page: {e}")
 
     def verify_job_created(self, job_title_option,job_title):
         with allure.step("Verify created job appears in Jobs list"):

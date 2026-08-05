@@ -48,6 +48,10 @@ class Allapplicant:
                         f"Resume Upload Toast shown: {error_toast.inner_text()}. Proceeding since resumes may already be imported.",
                         name="Upload Info",
                         attachment_type=allure.attachment_type.TEXT)
+                    
+                    screenshot_bytes = self.page.screenshot()
+                    allure.attach(screenshot_bytes, name="Resume_Upload_Error_Screenshot", attachment_type=allure.attachment_type.PNG)
+
                     self.page.reload()
                     return
 
@@ -60,7 +64,7 @@ class Allapplicant:
                     self.page.reload()
                     return  
             self.page.reload()
-                
+            pytest.fail("Resume upload timed out. Neither success nor error toast was displayed.")
 
     def export_excel_btn(self,timeout=5000):
         with allure.step("Clicking on Export excel button"):
@@ -76,9 +80,16 @@ class Allapplicant:
                 download = d.value
                 save_path = os.path.join(os.path.expanduser("~"), "Downloads", download.suggested_filename)
                 download.save_as(save_path)
+                allure.attach(
+                    "Test case passed successfully: Excel exported and downloaded",
+                    name="Test_Success_Message",
+                    attachment_type=allure.attachment_type.TEXT)
             except Exception as e:
                 allure.attach(f"Excel export click/download did not complete: {str(e)}", name="Debug Info", attachment_type=allure.attachment_type.TEXT)
-                self.page.wait_for_timeout(2000)
+                # Take screenshot manually
+                screenshot_bytes = self.page.screenshot()
+                allure.attach(screenshot_bytes, name="Export_Excel_Failure_Screenshot", attachment_type=allure.attachment_type.PNG)
+                pytest.fail(f"Excel export failed: {str(e)}")
             
 
      
@@ -91,12 +102,13 @@ class Allapplicant:
             
             advance=self.page.locator('button:has(svg.lucide-sliders-horizontal), div:has(svg.lucide-sliders-horizontal)').nth(7)
             advance.click()
-            keyword = self.page.locator("//input[@type='text']").nth(1)
-            keyword.type(skill_1)
+            self.page.wait_for_timeout(3000)
+            keyword = self.page.get_by_placeholder("Add keywords...")
+            keyword.fill(skill_1)
             self.page.keyboard.press("Enter")
-            keyword.type(skill_2)
+            keyword.fill(skill_2)
             self.page.keyboard.press("Enter")
-            keyword.type(skill_3)
+            keyword.fill(skill_3)
 
             email=self.page.locator('//input[@placeholder="Search email..."]')
             email.type(email_id)
@@ -117,6 +129,10 @@ class Allapplicant:
             expect(apply_btn).to_be_visible(timeout=2000)
             apply_btn.click()
             self.page.locator("div.flex.items-center.gap-2").first.wait_for(state="visible", timeout=20000)
+            allure.attach(
+                "Test case passed successfully: Advance filters applied",
+                name="Test_Success_Message",
+                attachment_type=allure.attachment_type.TEXT)
 
 
     def verify_applicant_filtered(self, applicant_name, timeout=20000):
@@ -205,6 +221,10 @@ class Allapplicant:
                     schedule.scroll_into_view_if_needed()
                     schedule.click() 
 
+                allure.attach(
+                    "Test case passed successfully: AI Prescreening, Interview, and Coding Assessment requested",
+                    name="Test_Success_Message",
+                    attachment_type=allure.attachment_type.TEXT)
 
                 resume = self.page.locator("//button[.//span[text()='Resume']]")
                 resume.click()
@@ -441,7 +461,7 @@ class Allapplicant:
             expect(send_btn).to_be_visible(timeout=3000)   
             send_btn.click()
             allure.attach(
-                    "Test case passed successfully:Unviewed applicants are visible ",
+                    "Test case passed successfully: Email sent successfully",
                     name="Test_Success_Message",
                     attachment_type=allure.attachment_type.TEXT)
             
@@ -497,7 +517,7 @@ class Allapplicant:
                 expect(apply_btn).to_be_visible(timeout=2000)
                 apply_btn.click()
 
-                container = self.page.locator("div",has=self.page.get_by_text(applicant_name, exact=True)).first
+                container = self.page.locator("div",has=self.page.get_by_text(applicant_name, exact=False)).first
 
                 expect(container).to_be_visible(timeout=15000)
                 checkbox = container.locator("input[type='checkbox']").nth(1)

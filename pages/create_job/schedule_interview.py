@@ -9,13 +9,15 @@ class ScheduleInterview:
     
     def test_select_applicant(self,applicant_name):
         with allure.step(f"Select applicant for interview: {applicant_name}"):
-            container = self.page.locator("button", has_text=applicant_name).first
-
-            expect(container).to_be_visible(timeout=15000)
-            checkbox = container.get_by_role("checkbox").first
-
-            expect(checkbox).to_be_visible(timeout=5000)
-            checkbox.click()
+            try:
+                container = self.page.locator("button", has_text=applicant_name).first
+                expect(container).to_be_visible(timeout=15000)
+                checkbox = container.get_by_role("checkbox").first
+                expect(checkbox).to_be_visible(timeout=5000)
+                checkbox.click()
+                allure.attach(f"Test case passed successfully: Applicant {applicant_name} selected", name="Success", attachment_type=allure.attachment_type.TEXT)
+            except Exception as e:
+                pytest.fail(f"Failed to select applicant {applicant_name}: {e}")
 
 
 
