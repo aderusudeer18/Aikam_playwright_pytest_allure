@@ -11,14 +11,14 @@ def test_login_valid_credtionals(page):
     login = LoginPage(page)
     login.open()
     #login.verify_forget_password("himakar.vempati@symphonize.com")
-    login.login("liliya.moka@symphonize.com", "Aikam@123") 
+    login.login("snigdha.dalavai@symphonize.com", "Symphonize8*") 
 
     dashboard=DashboardPage(page)
     dashboard.job_icon()
     
 
     job_page=JobsPage(page)
-    job_page.wait_until_jobs_page("Sym0071","Python developer") 
+    job_page.wait_until_jobs_page("Sym1133","Full stack developer") 
 
     view_btn=ViewJob(page)
     view_btn.view_job() 

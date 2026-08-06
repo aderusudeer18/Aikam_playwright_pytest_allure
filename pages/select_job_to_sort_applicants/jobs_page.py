@@ -12,18 +12,18 @@ class JobsPage:
         with allure.step("Verify job by job id in Jobs page"):
 
             self.page.locator('//input[@placeholder="Search"]').fill(job_id)
-            self.page.wait_for_timeout(500)  
-
+            
             job_row = self.page.locator("a.text-primary", has_text=job_title)
 
-            if job_row.count() > 0:
+            try:
+                job_row.first.wait_for(state="visible", timeout=timeout)
                 job_row.first.scroll_into_view_if_needed()
                 job_row.first.click()
                 allure.attach(
                     "Test case passed successfully:job is visible and clickable",
                     name="Test_Success_Message",
                     attachment_type=allure.attachment_type.TEXT)
-            else:
+            except Exception:
                 raise AssertionError(f" Job not found. Job ID: {job_id}, Job Title: {job_title}")
 
 

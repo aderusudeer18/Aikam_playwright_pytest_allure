@@ -9,7 +9,7 @@ class ViewJob:
     
     def view_job(self,timeout=3000):
         with allure.step("Click View Applicants"):
-            btn = self.page.locator("//p[contains(text(),'View Applicants')]")
+            btn = self.page.locator("//button[contains(text(),'View Applicants')]")
             expect(btn).to_be_visible(timeout=2000)
             btn.click()
             allure.attach(
