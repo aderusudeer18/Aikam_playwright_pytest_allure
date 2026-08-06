@@ -6,7 +6,7 @@ class LoginPage:
     def __init__(self,page):
         self.page=page
     def open(self):
-        self.page.goto("https://aikam-app-qa-793571778940.asia-south1.run.app/")
+        self.page.goto("https://persimmon.tekworks.ai/auth/log-in")
 
 
 
@@ -15,6 +15,7 @@ class LoginPage:
             self.page.wait_for_selector('//input[@id="email"]').fill(email)
             self.page.wait_for_selector('//input[@type="password"]').fill(password)
             self.page.wait_for_selector('//div[text()="Login"]').click()
+            self.page.wait_for_timeout(3000)
             
             if expect_success:
                 # Wait for dashboard icon to ensure login is complete/stable

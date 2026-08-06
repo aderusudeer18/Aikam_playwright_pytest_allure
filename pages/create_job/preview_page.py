@@ -14,4 +14,4 @@ class PreviewPage:
                 nxt_button.click()
                 allure.attach("Preview Page 'Next' clicked successfully", name="Success", attachment_type=allure.attachment_type.TEXT)
             except Exception as e:
-                raise Exception(f"Failed to click Next on Preview page: {e}")
+                pytest.fail(f"Failed to click Next on Preview page: {e}")

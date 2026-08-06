@@ -27,16 +27,37 @@ class ScheduleInterview:
                 self.page.on("dialog",lambda dialog:dialog.accept())
                 schedule_ai_interview=self.page.locator('//button[contains(text(),"Schedule AI Interview")]')
                 schedule_ai_interview.click()
-                self.page.locator('//label[contains(text(),"Video Interview")]').click()
-                self.page.locator('//label[contains(text(),"Coding Assessment")]').click()
-                self.page.locator("//button[contains(text(),'Next')]").click()
-                self.page.get_by_role("button", name="Next").click()
-                self.page.get_by_role("button", name="Next").click()
-                schedule_btn = self.page.get_by_role("button", name="Schedule", exact=True)
-                schedule_btn.click()
-                schedule_btn.wait_for(state="hidden", timeout=15000)
-                self.page.wait_for_timeout(5000)
                 
+                # Handle possible "Email Service Not Available" modal
+                continue_email = self.page.locator('button:has-text("Continue with aikam email")')
+                try:
+                    continue_email.wait_for(state="visible", timeout=3000)
+                    continue_email.click()
+                except:
+                    pass
+
+                # Click the checkboxes
+                video_checkbox = self.page.locator('button#video')
+                video_checkbox.click()
+                
+                coding_checkbox = self.page.locator('button#coding')
+                coding_checkbox.click()
+                
+                # Loop to handle any "Next" buttons until "Schedule" is visible
+                next_btn = self.page.get_by_role("button", name="Next", exact=True)
+                schedule_btn = self.page.get_by_role("button", name="Schedule", exact=True)
+                
+                for _ in range(5):
+                    self.page.wait_for_timeout(1000)
+                    if schedule_btn.is_visible():
+                        break
+                    if next_btn.is_visible():
+                        next_btn.first.click()
+                        
+                schedule_btn.first.click()
+                schedule_btn.first.wait_for(state="hidden", timeout=15000)
+                self.page.wait_for_timeout(5000)
+
                 allure.attach("Interview scheduled successfully", name="Success", attachment_type=allure.attachment_type.TEXT)
             except Exception as e:
                 pytest.fail(f"Failed to schedule interview: {e}")

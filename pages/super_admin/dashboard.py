@@ -13,6 +13,7 @@ class DashboardPage:
             # Use a more flexible locator, e.g. text or button
             self.page.locator('text=Create Organization').first.click()
             self.page.wait_for_timeout(2000)
+            allure.attach("Test case passed successfully: Clicked Create Organization button", name="Success", attachment_type=allure.attachment_type.TEXT)
 
     def org_details(self,name,admin_name,primary_email,option_text,phone_num):
         with allure.step("creating new organisation"):
@@ -53,6 +54,17 @@ class DashboardPage:
                 create_org_btn.click()
             else:
                 self.page.locator('text=Create Organization').last.click()
+                
+            # Check for success message toast (case-insensitive search for "successfully" or similar)
+            success_toast = self.page.locator("text=/success/i").first
+            try:
+                success_toast.wait_for(state="visible", timeout=5000)
+                allure.attach(success_toast.inner_text(), name="Success Message", attachment_type=allure.attachment_type.TEXT)
+            except:
+                allure.attach("No success message found within 5 seconds", name="Success Message Check", attachment_type=allure.attachment_type.TEXT)
+                screenshot_bytes = self.page.screenshot()
+                allure.attach(screenshot_bytes, name="Missing_Success_Toast_Screenshot", attachment_type=allure.attachment_type.PNG)
+                pytest.fail("Organization creation failed: No success message found")
                 
             # Wait for the modal to close and the organization to be fully created
             self.page.wait_for_timeout(5000)

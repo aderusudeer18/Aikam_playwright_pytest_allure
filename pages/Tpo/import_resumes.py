@@ -5,7 +5,7 @@ import os
 
 
 
-class ImportResume:
+class ImportResumes:
     def __init__(self,page):
         self.page=page
     def test_import_resumes(self, applicant_name, timeout=3000):

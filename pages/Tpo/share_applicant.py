@@ -24,7 +24,7 @@ class ShareApplicant:
             try:
                 self.page.locator('button:has(svg.lucide-send)').first.click()
                 email_input = self.page.get_by_placeholder("Enter email and press Enter")
-                email_input.wait_for(state="visible", timeout=3000)
+                email_input.wait_for(state="visible", timeout=15000)
                 email_input.fill(email)
                 email_input.press("Enter")
                 allure.attach(

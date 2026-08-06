@@ -476,7 +476,7 @@ class Allapplicant:
                 
 
             '''if filtered_applicant.count() > 0:
-                    self.page.get_by_text(applicant_name,exact=True).click()
+                    self.page.get_by_text(applicant_name,exact=False).click()
                     allure.attach(
                         "Test case passed successfully:Applicants has been filtered based on advance filters",
                         name="Test_Success_Message",
