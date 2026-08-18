@@ -6,7 +6,7 @@ class LoginPage:
     def __init__(self,page):
         self.page=page
     def open(self):
-        self.page.goto("https://persimmon.tekworks.ai/auth/log-in")
+        self.page.goto("https://aikam-app-qa-793571778940.asia-south1.run.app/")
 
 
 

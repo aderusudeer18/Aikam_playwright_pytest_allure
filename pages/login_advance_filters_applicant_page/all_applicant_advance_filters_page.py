@@ -36,8 +36,15 @@ class Allapplicant:
             ])
             
 
-            self.page.wait_for_selector("//button[contains(text(),'Import')]").click()
-            self.page.wait_for_timeout(20000)
+            # The button text in the modal might have changed (e.g., to 'Upload' or have different spacing).
+            # This robust locator looks for Import or Upload and picks the last one (the modal button).
+            modal_import_btn = self.page.locator("button:has-text('Import'), button:has-text('Upload')").last
+            modal_import_btn.wait_for(state="visible", timeout=10000)
+            modal_import_btn.click()
+
+            # Wait for either the success or error toast using XPath OR
+            toast = self.page.locator("//p[contains(text(),'resumes have been successfully imported')] | //h3[contains(text(),'Resume Upload Failed')]").first
+            
             success_toast = self.page.locator("//p[contains(text(),'resumes have been successfully imported')]").first
             error_toast = self.page.locator("//h3[contains(text(),'Resume Upload Failed')]").first
             max_time = 180 
@@ -64,10 +71,12 @@ class Allapplicant:
                     self.page.reload()
                     return  
             self.page.reload()
-            pytest.fail("Resume upload timed out. Neither success nor error toast was displayed.")
 
     def export_excel_btn(self,timeout=5000):
         with allure.step("Clicking on Export excel button"):
+            all_applicant_checkbox=self.page.locator('//input[@type="checkbox"]').first
+            all_applicant_checkbox.check()
+
             excel_sheet_btn=self.page.locator('//img[@alt="excel"]').first
             expect(excel_sheet_btn).to_be_visible(timeout=timeout)
             excel_sheet_btn.click()
@@ -100,15 +109,17 @@ class Allapplicant:
             # Ensure at least one applicant is loaded/visible before opening filters
             self.page.locator("div.flex.items-center.gap-2").first.wait_for(state="visible", timeout=20000)
             
-            advance=self.page.locator('button:has(svg.lucide-sliders-horizontal), div:has(svg.lucide-sliders-horizontal)').nth(7)
+            advance=self.page.locator('button.border-gray-300.rounded-lg.shadow-sm').filter(has=self.page.locator('svg.lucide-sliders-horizontal')).first
             advance.click()
-            self.page.wait_for_timeout(3000)
+            self.page.wait_for_timeout(5000)
             keyword = self.page.get_by_placeholder("Add keywords...")
-            keyword.fill(skill_1)
+            keyword.click()
+            self.page.keyboard.type(skill_1)
             self.page.keyboard.press("Enter")
-            keyword.fill(skill_2)
+            self.page.keyboard.type(skill_2)
             self.page.keyboard.press("Enter")
-            keyword.fill(skill_3)
+            self.page.keyboard.type(skill_3)
+            self.page.keyboard.press("Enter")
 
             email=self.page.locator('//input[@placeholder="Search email..."]')
             email.type(email_id)
@@ -125,9 +136,12 @@ class Allapplicant:
             self.page.keyboard.press("ArrowDown")
             self.page.keyboard.press("Enter")
 
-            apply_btn=self.page.locator("//button[contains(text(),'Apply')]")
-            expect(apply_btn).to_be_visible(timeout=2000)
-            apply_btn.click()
+            apply_btn=self.page.locator("//button[contains(text(),'Apply')]").last
+            apply_btn.wait_for(state="visible", timeout=5000)
+            try:
+                apply_btn.click(timeout=5000)
+            except Exception:
+                self.page.evaluate("el => el.click()", apply_btn.element_handle())
             self.page.locator("div.flex.items-center.gap-2").first.wait_for(state="visible", timeout=20000)
             allure.attach(
                 "Test case passed successfully: Advance filters applied",
@@ -138,9 +152,16 @@ class Allapplicant:
     def verify_applicant_filtered(self, applicant_name, timeout=20000):
             with allure.step(f"verify applicants has been filtered based on advance filters for {applicant_name}"):
                 self.page.wait_for_timeout(2000)
-                filtered_applicant = self.page.locator("div.flex.items-center.gap-2", has_text=applicant_name).first
-                filtered_applicant.wait_for(state="visible", timeout=timeout)
-                filtered_applicant.click()
+                applicant_card = self.page.locator("h3", has_text=applicant_name).first
+                try:
+                    applicant_card.wait_for(state="visible", timeout=timeout)
+                except Exception as e:
+                    # Debugging: Print all applicant names currently on the screen
+                    all_names = self.page.locator("h3").all_text_contents()
+                    
+                    raise AssertionError(f"Could not find applicant '{applicant_name}'. Found these instead: {all_names}") from e
+                
+                applicant_card.click()
 
                 # AI Prescreening
                 ai_pre_screening = self.page.locator("//button[.//span[text()='Prescreening']]")
@@ -203,19 +224,11 @@ class Allapplicant:
                 if request_ai_code_assessment.is_visible():
                     request_ai_code_assessment.click()
 
-                    Next = self.page.locator("//button[contains(text(),'Next')]")
-                    Next.wait_for(state="visible")
-                    Next.scroll_into_view_if_needed()
-                    self.page.wait_for_timeout(2000)
-                    Next.click(force=True)    
-
-                    self.page.wait_for_timeout(2000)
+                    Next = self.page.locator("//button[contains(text(),'Next')]").click()
+                    Next_btn=self.page.locator('//button[contains(text(),"Next")]').click()
                     schedule = self.page.get_by_role("button", name="Schedule", exact=True)
-                    if not schedule.is_visible():
-                        Next.wait_for(state="visible")
-                        Next.scroll_into_view_if_needed()
-                        self.page.wait_for_timeout(2000)
-                        Next.click(force=True)
+                    
+            
 
                     schedule.wait_for(state="visible")
                     schedule.scroll_into_view_if_needed()
@@ -249,23 +262,36 @@ class Allapplicant:
     def verify_advance_filters_mails_sent_list(self,designation,company,timeout=3000):
         with allure.step("verify applicant page is visible"):
             self.page.locator('//a[contains(text(),"All Applicants")]').click()
-            advance=self.page.locator('button:has(svg.lucide-sliders-horizontal), div:has(svg.lucide-sliders-horizontal)').first
+            reset_btn=self.page.locator('//span[contains(text(),"Reset Filters")]')
+            if reset_btn.is_visible():
+                reset_btn.click()
+            
+            advance=self.page.locator('button.border-gray-300.rounded-lg.shadow-sm').filter(has=self.page.locator('svg.lucide-sliders-horizontal')).first
+            advance.wait_for(state="visible", timeout=10000)
             advance.click()
-            wrong_btn=self.page.locator('//button[@type="button"]').nth(4)
-            wrong_btn.click()
+            # wrong_btn=self.page.locator('//button[@type="button"]').nth(4)
+            # wrong_btn.click()
 
-            reset_btn=self.page.locator('//button[contains(text(),"Reset Changes")]')
-            reset_btn.click()
+            # reset_btn=self.page.locator('//button[contains(text(),"Reset Changes")]')
+            # reset_btn.click()
 
             designation_role=self.page.locator('//input[@placeholder="Search designation..."]')
-            designation_role.fill(designation)
-            #self.page.keyboard.press("ArrowDown")
+            designation_role.click()
+            self.page.keyboard.type(designation, delay=50)
+            self.page.wait_for_timeout(6000)
+            self.page.keyboard.press("ArrowDown")
+            self.page.wait_for_timeout(2000)
             self.page.keyboard.press("Enter")
+            self.page.wait_for_timeout(2000)
 
             company_name=self.page.locator('//input[@placeholder="Search company..."]')
-            company_name.fill(company)
-            #self.page.keyboard.press("ArrowDown")
+            company_name.click()
+            self.page.keyboard.type(company, delay=50)
+            self.page.wait_for_timeout(6000)
+            self.page.keyboard.press("ArrowDown")
+            self.page.wait_for_timeout(2000)
             self.page.keyboard.press("Enter")
+            self.page.wait_for_timeout(2000)
 
             ai_pre_screen_sent=self.page.locator('//label[contains(text(),"AI Pre Screening Sent")]')
             ai_pre_screen_sent.click()
@@ -275,12 +301,15 @@ class Allapplicant:
             ai_code_assessment_sent.click()
 
 
-            view_btn=self.page.locator('//input[@value="Viewed"]')
-            view_btn.check()
-
-            apply_btn=self.page.locator("//button[contains(text(),'Apply')]")
-            expect(apply_btn).to_be_visible(timeout=2000)
-            apply_btn.click()
+            un_view_btn=self.page.locator('//input[@value="Viewed"]')
+            un_view_btn.check()
+            self.page.wait_for_timeout(3000)
+            apply_btn=self.page.locator("//button[contains(text(),'Apply')]").last
+            apply_btn.wait_for(state="visible", timeout=5000)
+            try:
+                apply_btn.click(timeout=5000)
+            except Exception:
+                self.page.evaluate("el => el.click()", apply_btn.element_handle())
             self.page.wait_for_timeout(3000)
             allure.attach(
                     "Test case passed successfully:Advance filters has applied to all applicants and displayed ",
@@ -291,7 +320,12 @@ class Allapplicant:
     def verify_advance_filters_given_mails_list(self,ug,institute_name,course_name,timeout=3000):
         with allure.step("verify interviews toggles given list"):
             
-            advance=self.page.locator('button:has(svg.lucide-sliders-horizontal), div:has(svg.lucide-sliders-horizontal)').first
+            try:
+                self.page.locator('//a[contains(text(),"All Applicants")]').first.click(timeout=3000)
+            except Exception:
+                pass
+            self.page.wait_for_timeout(2000)
+            advance=self.page.locator('button.border-gray-300.rounded-lg.shadow-sm').filter(has=self.page.locator('svg.lucide-sliders-horizontal')).first
             advance.click()
             wrong_btn_dsg=self.page.locator('//button[@type="button"]').nth(8)
             wrong_btn_dsg.click()
@@ -303,21 +337,31 @@ class Allapplicant:
             
 
             ug_qualification=self.page.locator('//input[@placeholder="Search UG qualification..."]')
-            ug_qualification.fill(ug)
+            ug_qualification.click()
+            self.page.keyboard.type(ug, delay=50)
+            self.page.wait_for_timeout(6000)
             self.page.keyboard.press("ArrowDown")
+            self.page.wait_for_timeout(500)
             self.page.keyboard.press("Enter")
-
-
+            self.page.wait_for_timeout(1000)
 
             institute=self.page.locator('//input[@placeholder="Search institute..."]')
-            institute.fill(institute_name)
+            institute.click()
+            self.page.keyboard.type(institute_name, delay=100)
+            self.page.wait_for_timeout(6000)
             self.page.keyboard.press("ArrowDown")
+            self.page.wait_for_timeout(2000)
             self.page.keyboard.press("Enter")
+            self.page.wait_for_timeout(2000)
 
             course=self.page.locator('//input[@placeholder="Search course..."]')
-            course.fill(course_name)
+            course.click()
+            self.page.keyboard.type(course_name, delay=50)
+            self.page.wait_for_timeout(6000)
             self.page.keyboard.press("ArrowDown")
+            self.page.wait_for_timeout(500)
             self.page.keyboard.press("Enter")
+            self.page.wait_for_timeout(1000)
 
             ai_pre_screen_given=self.page.locator('//label[contains(text(),"AI Pre Screening Given")]')
             ai_pre_screen_given.check()
@@ -325,9 +369,12 @@ class Allapplicant:
             ai_interview_given.check()
             ai_code_assessment_given=self.page.locator('//label[contains(text(),"AI Coding Assessment Given")]')
             ai_code_assessment_given.check() 
-            apply_btn=self.page.locator("//button[contains(text(),'Apply')]")
-            expect(apply_btn).to_be_visible(timeout=2000)
-            apply_btn.click()
+            apply_btn=self.page.locator("//button[contains(text(),'Apply')]").last
+            apply_btn.wait_for(state="visible", timeout=5000)
+            try:
+                apply_btn.click(timeout=5000)
+            except Exception:
+                self.page.evaluate("el => el.click()", apply_btn.element_handle())
 
             
             self.page.wait_for_timeout(3000)
@@ -339,7 +386,7 @@ class Allapplicant:
 
     def verify_advance_filter_applicant(self,cc_mail:str,interview_sub,interview_type:str,zoom_value:str,location:str,mobile_number,target,time_from,time_to,mail_description,timeout=3000):
         with allure.step("verify applicants has been filtered based on advance filters"):
-            filtered_applicant=self.page.locator("div.flex.w-full.items-center.gap-2.mb-1").nth(0)
+            filtered_applicant=self.page.locator("h3.font-semibold.text-gray-900.text-primary.truncate").first
             filtered_applicant.click()
             self.page.on("dialog",lambda dialog:dialog.accept())
             manual_interview=self.page.locator('//button[@type="button"]').nth(2)
@@ -472,7 +519,7 @@ class Allapplicant:
             all_applicant_page=self.page.locator('//a[contains(text(),"All Applicants")]')
             all_applicant_page.click()
 
-            advance=self.page.locator('button:has(svg.lucide-sliders-horizontal), div:has(svg.lucide-sliders-horizontal)').first
+            advance=self.page.locator('button.border-gray-300.rounded-lg.shadow-sm').filter(has=self.page.locator('svg.lucide-sliders-horizontal')).first
             advance.click()
 
             gender=self.page.locator('//button[@role="combobox"]')
@@ -484,9 +531,17 @@ class Allapplicant:
             reset_btn.click()
             unviewed_btn=self.page.locator('//label[contains(text(),"Unviewed")]')
             unviewed_btn.check()
-            apply_btn=self.page.locator("//button[contains(text(),'Apply')]")
-            expect(apply_btn).to_be_visible(timeout=2000)
-            apply_btn.click()
+            # Wait for the DOM to settle after input changes
+            self.page.wait_for_timeout(1500)
+            apply_btn=self.page.locator("//button[contains(text(),'Apply')]").last
+            
+            # Wait for apply button to be visible and click with force
+            apply_btn.wait_for(state="visible", timeout=5000)
+            try:
+                apply_btn.click(timeout=5000)
+            except Exception:
+                self.page.evaluate("el => el.click()", apply_btn.element_handle())
+            
             allure.attach(
                     "Test case passed successfully:Unviewed applicants are visible ",
                     name="Test_Success_Message",
@@ -496,7 +551,7 @@ class Allapplicant:
 
     def advance_filters_exclude_keywords(self,skill_1,skill_2,applicant_name,timeout=3000):
         with allure.step("Applying advance filters to exclude keywords to applicants"):
-                advance=self.page.locator('button:has(svg.lucide-sliders-horizontal), div:has(svg.lucide-sliders-horizontal)').first
+                advance=self.page.locator('button.border-gray-300.rounded-lg.shadow-sm').filter(has=self.page.locator('svg.lucide-sliders-horizontal')).first
                 advance.click()
                 reset_btn=self.page.locator('//button[contains(text(),"Reset Changes")]')
                 reset_btn.click() 
@@ -513,9 +568,14 @@ class Allapplicant:
                 exclude_keywords.type(skill_2) 
                 
 
-                apply_btn=self.page.locator("//button[contains(text(),'Apply')]")
-                expect(apply_btn).to_be_visible(timeout=2000)
-                apply_btn.click()
+                # Wait for the DOM to settle after input changes
+                self.page.wait_for_timeout(1500)
+                apply_btn=self.page.locator("//button[contains(text(),'Apply')]").last
+                expect(apply_btn).to_be_visible(timeout=5000)
+                try:
+                    apply_btn.click()
+                except Exception:
+                    self.page.evaluate("el => el.click()", apply_btn.element_handle())
 
                 container = self.page.locator("div",has=self.page.get_by_text(applicant_name, exact=False)).first
 

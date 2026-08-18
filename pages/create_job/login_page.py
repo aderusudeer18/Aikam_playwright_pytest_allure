@@ -7,7 +7,7 @@ class LoginPage:
         self.page = page
 
     def open(self):
-        self.page.goto("https://aikam-app-qa-793571778940.asia-south1.run.app/")
+        self.page.goto("https://uat.aikam.ai/")
 
     def login_invald_email(self, email, password):
         with allure.step("Login with invalid email"):

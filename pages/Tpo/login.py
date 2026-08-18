@@ -43,8 +43,8 @@ class LoginPage:
             
             # Wait for login success (Dashboard or Jobs - depends on user role)
             try:
-                # Use regex to match either dashboard or jobs
-                self.page.wait_for_url(re.compile(r".*/(dashboard|jobs)"), timeout=15000)
+                # Use regex to match either dashboard or jobs, with wait_until="commit" for SPA routing
+                self.page.wait_for_url(re.compile(r".*/(dashboard|jobs)"), timeout=30000, wait_until="commit")
             except Exception as e:
                 # Screenshot handled by conftest
                 

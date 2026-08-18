@@ -9,16 +9,16 @@ class JobsPage:
         self.page = page
 
 
-    def verify_job_title(self,job_id,timeout=2000):
+    def verify_job_title(self,job_id,timeout=4000):
         with allure.step("verify filter using Job title"):
     
 
             search = self.page.locator('//input[@placeholder="Search"]')
             search.wait_for(state="visible")
             search.fill(job_id)
-            
+            self.page.wait_for_timeout(4000)
             job_card = self.page.locator("div", has=self.page.get_by_text(job_id)).first
-            job_card.wait_for(state="visible", timeout=5000)
+            job_card.wait_for(state="visible", timeout=7000)
             
             view_job_btn = job_card.locator('//button[contains(text(),"View Job")]').first
             view_job_btn.click()

@@ -24,29 +24,29 @@ def test_login_valid_credtionals(page):
 
 
     applicant_page=AllApplicant(page)
-    applicant_page.search_by_name("Ratul Gangopadhyay") 
-    applicant_page.all_applicant_page("Ratul Gangopadhyay")
+    applicant_page.search_by_name("MOHAMMED IMRAN") 
+    applicant_page.all_applicant_page("MOHAMMED IMRAN")
     applicant_page.download_excel_btn()
 
-    applicant_page.all_applicant_pre_screened("Ratul Gangopadhyay")
-    applicant_page.move_to_applicant_pre_screened("Ratul Gangopadhyay")
+    applicant_page.all_applicant_pre_screened("MOHAMMED IMRAN")
+    applicant_page.move_to_applicant_pre_screened("MOHAMMED IMRAN")
 
 
-    applicant_page.search_by_name("Mariselvam R")
-    applicant_page.all_applicant_shortlisted("Mariselvam R")
+    applicant_page.search_by_name("CHITTAJALLU HEMANTH")
+    applicant_page.all_applicant_shortlisted("CHITTAJALLU HEMANTH")
     applicant_page.move_to_applicant_shortlisted()  
     
 
-    applicant_page.search_by_name("Bala Sri Ram Vankayala")
-    applicant_page.all_applicant_interviewing("Bala Sri Ram Vankayala")
+    applicant_page.search_by_name("MIRTHIPATI DURGALAKSHMI")
+    applicant_page.all_applicant_interviewing("MIRTHIPATI DURGALAKSHMI")
     applicant_page.move_to_applicant_interviewing()
 
-    applicant_page.search_by_name("Sarvana Kumar R")
-    applicant_page.all_applicant_selected("Sarvana Kumar R")
+    applicant_page.search_by_name("JAGADISH B")
+    applicant_page.all_applicant_selected("JAGADISH B")
     applicant_page.move_to_applicant_selected()
     
-    applicant_page.search_by_name("Venkata Sai Eluri")
-    applicant_page.all_applicant_rejected("Venkata Sai Eluri")
+    applicant_page.search_by_name("KAVYA GIDDALA")
+    applicant_page.all_applicant_rejected("KAVYA GIDDALA")
     applicant_page.move_to_applicant_rejected()
 
 
