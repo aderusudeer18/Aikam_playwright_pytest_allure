@@ -25,9 +25,19 @@ class ScheduleInterview:
         with allure.step("verify to schedule interview to applicant"):
             try:
                 self.page.on("dialog",lambda dialog:dialog.accept())
+                
+                # Wait for any previous actions/network to settle
+                self.page.wait_for_load_state("networkidle")
+                
                 schedule_ai_interview=self.page.locator('//button[contains(text(),"Schedule AI Interview")]')
+                schedule_ai_interview.wait_for(state="visible", timeout=15000)
                 schedule_ai_interview.click()
-                self.page.locator('//label[contains(text(),"Video Interview")]').click()
+                
+                # Wait for the modal/options to appear before clicking
+                video_interview = self.page.locator('//label[contains(text(),"Video Interview")]')
+                video_interview.wait_for(state="visible", timeout=15000)
+                video_interview.click()
+                
                 self.page.locator('//label[contains(text(),"Coding Assessment")]').click()
                 self.page.locator("//button[contains(text(),'Next')]").click()
                 self.page.get_by_role("button", name="Next").click()

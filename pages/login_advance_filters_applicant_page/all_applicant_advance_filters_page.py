@@ -107,10 +107,14 @@ class Allapplicant:
     def advance_filters(self,skill_1,skill_2,skill_3,email_id,number,can_loc_1,can_loc_2,timeout=3000):
         with allure.step("Applying advance filters to applicants"):
             # Ensure at least one applicant is loaded/visible before opening filters
-            self.page.locator("div.flex.items-center.gap-2").first.wait_for(state="visible", timeout=20000)
+            #self.page.locator("div.flex.items-center.gap-2").first.wait_for(state="visible", timeout=20000)
             
-            advance=self.page.locator('button.border-gray-300.rounded-lg.shadow-sm').filter(has=self.page.locator('svg.lucide-sliders-horizontal')).first
+            advance = self.page.locator('button').filter(has=self.page.locator('svg.lucide-sliders-horizontal')).first
+            advance.wait_for(state="visible", timeout=15000)
             advance.click()
+            self.page.wait_for_timeout(2000)
+            advance_filter=self.page.locator('//button[contains(text(),"Filters")]')
+            advance_filter.click()
             self.page.wait_for_timeout(5000)
             keyword = self.page.get_by_placeholder("Add keywords...")
             keyword.click()
@@ -150,7 +154,7 @@ class Allapplicant:
 
 
     def verify_applicant_filtered(self, applicant_name, timeout=20000):
-            with allure.step(f"verify applicants has been filtered based on advance filters for {applicant_name}"):
+            with allure.step(f"verify applicants has been filtered based on filters for {applicant_name}"):
                 self.page.wait_for_timeout(2000)
                 applicant_card = self.page.locator("h3", has_text=applicant_name).first
                 try:
@@ -190,7 +194,7 @@ class Allapplicant:
                     schedule.click()
 
                 # Interview
-                interview_tab = self.page.locator("//button[.//span[text()='Interview']]")
+                interview_tab = self.page.locator('//span[contains(text(),"Interview")]').first
                 interview_tab.wait_for(state="visible")
                 interview_tab.click()
                 request_ai_interview = self.page.locator("//button[contains(text(),'Request') and contains(text(),'Interview')]")
@@ -217,8 +221,9 @@ class Allapplicant:
                     schedule.click()
 
                 # Coding Assessment
+                self.page.wait_for_timeout(3000)
                 ai_code_assessment = self.page.locator("//button[.//span[text()='Coding Assessment']]")
-                ai_code_assessment.click()
+                ai_code_assessment.click(force=True)
                 request_ai_code_assessment = self.page.locator("//button[contains(text(),'Request Coding Assessment')]")
                 self.page.wait_for_timeout(2000)
                 if request_ai_code_assessment.is_visible():
@@ -262,13 +267,18 @@ class Allapplicant:
     def verify_advance_filters_mails_sent_list(self,designation,company,timeout=3000):
         with allure.step("verify applicant page is visible"):
             self.page.locator('//a[contains(text(),"All Applicants")]').click()
-            reset_btn=self.page.locator('//span[contains(text(),"Reset Filters")]')
-            if reset_btn.is_visible():
-                reset_btn.click()
-            
-            advance=self.page.locator('button.border-gray-300.rounded-lg.shadow-sm').filter(has=self.page.locator('svg.lucide-sliders-horizontal')).first
-            advance.wait_for(state="visible", timeout=10000)
+            reset_filters=self.page.locator('//span[contains(text(),"Reset Filters")]')
+            self.page.wait_for_timeout(2000)
+            reset_filters.click(force=True)
+
+            advance = self.page.locator('button').filter(has=self.page.locator('svg.lucide-sliders-horizontal')).first
+            advance.wait_for(state="visible", timeout=15000)
             advance.click()
+
+            self.page.wait_for_timeout(2000)
+            advance_filter=self.page.locator('//button[contains(text(),"Filters")]')
+            advance_filter.click()
+
             # wrong_btn=self.page.locator('//button[@type="button"]').nth(4)
             # wrong_btn.click()
 
@@ -312,7 +322,7 @@ class Allapplicant:
                 self.page.evaluate("el => el.click()", apply_btn.element_handle())
             self.page.wait_for_timeout(3000)
             allure.attach(
-                    "Test case passed successfully:Advance filters has applied to all applicants and displayed ",
+                    "Test case passed successfully:filters has applied to all applicants and displayed ",
                     name="Test_Success_Message",
                     attachment_type=allure.attachment_type.TEXT) 
 
@@ -325,8 +335,11 @@ class Allapplicant:
             except Exception:
                 pass
             self.page.wait_for_timeout(2000)
-            advance=self.page.locator('button.border-gray-300.rounded-lg.shadow-sm').filter(has=self.page.locator('svg.lucide-sliders-horizontal')).first
+            advance = self.page.locator('button').filter(has=self.page.locator('svg.lucide-settings2')).first
             advance.click()
+            self.page.wait_for_timeout(2000)
+            advance_filter=self.page.locator('//button[contains(text(),"Advanced Filters")]')
+            advance_filter.click()
             wrong_btn_dsg=self.page.locator('//button[@type="button"]').nth(8)
             wrong_btn_dsg.click()
             wrong_btn_company=self.page.locator('//button[@type="button"]').nth(6)
@@ -519,8 +532,11 @@ class Allapplicant:
             all_applicant_page=self.page.locator('//a[contains(text(),"All Applicants")]')
             all_applicant_page.click()
 
-            advance=self.page.locator('button.border-gray-300.rounded-lg.shadow-sm').filter(has=self.page.locator('svg.lucide-sliders-horizontal')).first
+            advance = self.page.locator('button').filter(has=self.page.locator('svg.lucide-settings2')).first
             advance.click()
+            self.page.wait_for_timeout(2000)
+            advance_filter=self.page.locator('//button[contains(text(),"Advanced Filters")]')
+            advance_filter.click()
 
             gender=self.page.locator('//button[@role="combobox"]')
             gender.click()
@@ -551,8 +567,11 @@ class Allapplicant:
 
     def advance_filters_exclude_keywords(self,skill_1,skill_2,applicant_name,timeout=3000):
         with allure.step("Applying advance filters to exclude keywords to applicants"):
-                advance=self.page.locator('button.border-gray-300.rounded-lg.shadow-sm').filter(has=self.page.locator('svg.lucide-sliders-horizontal')).first
+                advance = self.page.locator('button').filter(has=self.page.locator('svg.lucide-settings2')).first
                 advance.click()
+                self.page.wait_for_timeout(2000)
+                advance_filter=self.page.locator('//button[contains(text(),"Advanced Filters")]')
+                advance_filter.click()
                 reset_btn=self.page.locator('//button[contains(text(),"Reset Changes")]')
                 reset_btn.click() 
 

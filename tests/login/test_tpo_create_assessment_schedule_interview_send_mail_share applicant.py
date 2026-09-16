@@ -32,16 +32,30 @@ def test_login_valid_credtionals(page):
     view_applicant=ViewJob(page)
     view_applicant.view_job() 
 
+    # 2.5. Import Resumes
+    resume = ImportResumes(page)
+    resume_paths = [
+        r"C:\Users\Sudeer\Downloads\CST 2\CST 2\resumes_10\Naukri_MdShahnawaz[3y_2m] - Copy.pdf",
+        r"C:\Users\Sudeer\Downloads\CST 2\CST 2\resumes_10\Naukri_MdShahnawaz[3y_2m].pdf",
+        r"C:\Users\Sudeer\Downloads\CST 2\CST 2\resumes_10\Naukri_M.SameeraBegum.[4y_0m].pdf",
+        r"C:\Users\Sudeer\Downloads\CST 2\CST 2\resumes_10\Naukri_LAKSHMIPRASANNAKOLUSU[2y_0m].pdf",
+        r"C:\Users\Sudeer\Downloads\CST 2\CST 2\resumes_10\Naukri_JalandharBhoi[3y_11m].pdf",
+        r"C:\Users\Sudeer\Downloads\CST 2\CST 2\resumes_10\Naukri_KaavatiRohith[2y_1m].pdf"
+    ]
+    applicant_names = ["MD SHAHNAWAZ", "Sameera", "LAKSHMI PRASANNA", "Jalandhar Bhoi", "Kaavati Rohith"]
+    resume.test_import_resumes(applicant_names, resume_paths)
+
     # 3. Schedule Interview
     schedule = ScheduleInterview(page)
-    schedule.test_select_applicant("gggggg")
+    schedule.test_select_applicant("MD SHAHNAWAZ")
     schedule.test_schedule_interview()
 
     # 4. Send Mail
-    # The applicant "gggggg" is already selected by the previous step, so we just send mail
     send_mail = SendMail(page)
+    send_mail.test_select_applicant("MD SHAHNAWAZ")
     send_mail.test_send_mail()
 
     # 5. Share Applicant
     share = ShareApplicant(page)
+    share.test_select_applicant("MD SHAHNAWAZ")
     share.test_share_applicant()

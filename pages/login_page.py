@@ -2,19 +2,23 @@ from playwright.sync_api import playwright, expect
 import allure
 import re
 
+from constants.urls import URLs
+from constants.messages import ErrorMessages
+from constants.locators import LoginLocators
+
 class LoginPage:
     def __init__(self, page):
         self.page = page
 
     def open(self):
-        self.page.goto("https://app.aikam.ai/")
+        self.page.goto(URLs.BASE_URL)
 
     def login_invald_email(self, email, password):
         with allure.step("Login with invalid email"):
-            self.page.wait_for_selector('//input[@type="email"]').fill(email)
-            self.page.wait_for_selector('//input[@type="password"]').fill(password)
-            self.page.wait_for_selector('//div[text()="Login"]').click()
-            error =self.page.get_by_text("Please enter a valid email address")
+            self.page.locator(LoginLocators.EMAIL_INPUT_TYPE).fill(email)
+            self.page.locator(LoginLocators.PASSWORD_INPUT).fill(password)
+            self.page.locator(LoginLocators.LOGIN_BTN).click()
+            error =self.page.get_by_text(ErrorMessages.INVALID_EMAIL)
             try:
                 expect(error).to_be_visible(timeout=5000)
                 allure.attach("Error message displayed successfully", name="Success", attachment_type=allure.attachment_type.TEXT)
@@ -24,10 +28,10 @@ class LoginPage:
     
     def login_invalid_password(self, email, password):
         with allure.step("Login with invalid invalid password"):
-            self.page.wait_for_selector('//input[@type="email"]').fill(email)
-            self.page.wait_for_selector('//input[@type="password"]').fill(password)
-            self.page.wait_for_selector('//div[text()="Login"]').click()
-            error =self.page.get_by_text("Invalid email or password")
+            self.page.locator(LoginLocators.EMAIL_INPUT_TYPE).fill(email)
+            self.page.locator(LoginLocators.PASSWORD_INPUT).fill(password)
+            self.page.locator(LoginLocators.LOGIN_BTN).click()
+            error =self.page.get_by_text(ErrorMessages.INVALID_CREDENTIALS)
             try:
                 expect(error).to_be_visible(timeout=5000)
                 allure.attach("Error message displayed successfully", name="Success", attachment_type=allure.attachment_type.TEXT)
@@ -37,12 +41,10 @@ class LoginPage:
 
     def login(self, email, password):
         with allure.step("Login with valid email and password"):
-            self.page.locator('//input[@id="email"]').fill(email)
+            self.page.locator(LoginLocators.EMAIL_INPUT_ID).fill(email)
             
-
-            
-            self.page.wait_for_selector('//input[@type="password"]').fill(password)
-            self.page.wait_for_selector('//div[text()="Login"]').click()
+            self.page.locator(LoginLocators.PASSWORD_INPUT).fill(password)
+            self.page.locator(LoginLocators.LOGIN_BTN).click()
             
             # Wait for login success (Dashboard or Jobs - depends on user role)
             try:
@@ -51,7 +53,7 @@ class LoginPage:
             except Exception as e:
                 # Screenshot handled by conftest
                 
-                error_msg = self.page.locator("text=Invalid email or password")
+                error_msg = self.page.locator(ErrorMessages.INVALID_CREDENTIALS_LOCATOR_TEXT)
                 if error_msg.is_visible():
                      raise Exception(f"Login failed: '{error_msg.inner_text()}' message displayed.")
                 

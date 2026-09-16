@@ -10,17 +10,8 @@ class jobsPage:
         with allure.step(f"Select job: {job_name}"):
             self.page.wait_for_load_state("networkidle")
             
-            # Try to select 'Assessment Title' or 'Job Title' from the combobox if it exists
-            combobox = self.page.locator('//button[@role="combobox"]')
-            if combobox.count() > 0 and combobox.first.is_visible():
-                combobox.first.click()
-                # Find the option that contains 'Title'
-                option = self.page.get_by_role("option", name="Title", exact=False).first
-                if option.is_visible():
-                    option.click()
-            
-            # The search input is now configured for Title
-            search_box = self.page.locator('//input[@placeholder="Search"]')
+            # The search input is configured for Title
+            search_box = self.page.locator('input[placeholder="Search Assessment Title"]')
             
             search_box.first.wait_for(state="visible", timeout=timeout)
             search_box.first.click() 
@@ -30,7 +21,7 @@ class jobsPage:
             
             try:
                 # After filtering, click the View Job button
-                view_job_btn = self.page.locator('//button[contains(text(),"View Job")]').first
+                view_job_btn = self.page.locator('//button[contains(text(),"View Assessment") or contains(text(),"View Job")]').first
                 
                 view_job_btn.wait_for(state="visible", timeout=timeout)
                 view_job_btn.scroll_into_view_if_needed()

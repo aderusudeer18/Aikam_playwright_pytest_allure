@@ -8,15 +8,19 @@ import os
 class ImportResumes:
     def __init__(self,page):
         self.page=page
-    def test_import_resumes(self, applicant_name, timeout=3000):
-        with allure.step("Verify resumes has imported "):
+    def test_import_resumes(self, applicant_names, resume_paths=None, timeout=3000):
+        with allure.step("Verify resumes have imported "):
             import_resume=self.page.locator("//span[contains(text(),'Import Resumes')]")
             import_resume.click()
             
-            resume_path = os.path.join(os.path.expanduser("~"), "Downloads", "Aikam_A.Balaji_Resume.pdf")
+            if resume_paths is None:
+                resume_paths = [os.path.join(os.path.expanduser("~"), "Downloads", "Aikam_A.Balaji_Resume.pdf")]
+                
+            if not isinstance(applicant_names, list):
+                applicant_names = [applicant_names]
             
             try:
-                self.page.set_input_files('input[type="file"]', resume_path)
+                self.page.set_input_files('input[type="file"]', resume_paths)
                 self.page.wait_for_selector("//button[contains(text(),'Import')]").click()
                 
                 # Wait for 2 minutes for processing
@@ -24,10 +28,14 @@ class ImportResumes:
                 
                 # Reload the page to make the applicant visible
                 self.page.wait_for_timeout(5000)
+                self.page.reload()
+                self.page.wait_for_timeout(5000)
                 
-                applicant_locator=self.page.locator(f"text={applicant_name}")
-                expect(applicant_locator).to_be_visible(timeout=70000)
-                allure.attach("Test case passed successfully: Resume imported and applicant is visible", name="Success", attachment_type=allure.attachment_type.TEXT)
+                for applicant_name in applicant_names:
+                    applicant_locator=self.page.locator(f"text={applicant_name}").first
+                    expect(applicant_locator).to_be_visible(timeout=70000)
+                    
+                allure.attach("Test case passed successfully: Resumes imported and applicants are visible", name="Success", attachment_type=allure.attachment_type.TEXT)
             except Exception as e:
                 
                 error_toast = self.page.locator("text=Error uploading file") 
@@ -37,10 +45,6 @@ class ImportResumes:
         
                     page_text = self.page.inner_text("body")
                     allure.attach(page_text, name="Page_Text_Debug", attachment_type=allure.attachment_type.TEXT)
-                    pytest.fail(f"Resume verification failed. Expected '{applicant_name}' to be visible. Error: {e}") 
+                    pytest.fail(f"Resume verification failed. Expected '{applicant_names}' to be visible. Error: {e}") 
 
             self.page.reload() 
-
-   
-
-
